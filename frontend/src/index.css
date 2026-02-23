@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes cbFadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cbFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
+}
+
+@keyframes cbShimmer {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+@keyframes cbNavPop {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  45% { transform: translate3d(0, -1px, 0) scale(1.06); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes cbSoftPulse {
+  0%, 100% { opacity: 0.18; }
+  50% { opacity: 0.32; }
+}
+
+.cb-anim-fade-in-up {
+  animation: cbFadeInUp 520ms ease-out both;
+}
+
+.cb-anim-float {
+  animation: cbFloat 7s ease-in-out infinite;
+}
+
+.cb-anim-float-slow {
+  animation: cbFloat 10s ease-in-out infinite;
+}
+
+.cb-anim-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.cb-anim-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: translateX(-120%);
+  animation: cbShimmer 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cb-anim-nav-pop {
+  animation: cbNavPop 260ms ease-out both;
+}
+
+.cb-anim-soft-pulse {
+  animation: cbSoftPulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-anim-fade-in-up,
+  .cb-anim-float,
+  .cb-anim-float-slow,
+  .cb-anim-shimmer::after,
+  .cb-anim-nav-pop,
+  .cb-anim-soft-pulse {
+    animation: none !important;
+  }
+}
+
+
+
+
+
