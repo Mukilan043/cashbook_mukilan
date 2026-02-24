@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Cash Book Application
 
 A full-stack web application for managing cash inflow and outflow with user authentication, multiple cashbooks, balance tracking, transaction history, and PDF report generation.
@@ -276,3 +277,6 @@ serve -s dist
 - **Authentication issues**: Clear browser localStorage
 - **CORS errors**: Ensure backend CORS is configured correctly
 - **Port conflicts**: Change PORT in backend or frontend config
+=======
+# cashbook
+>>>>>>> 9217ba10bae22e68dd42c4d57adff289d7102431
