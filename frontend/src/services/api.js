@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { cacheDelByPrefix, withOfflineCache } from '../utils/offlineCache';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://happy-prosperity-production.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://happy-prosperity-production.up.railway.app/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
