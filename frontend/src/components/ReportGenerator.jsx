@@ -395,35 +395,68 @@ const ReportGenerator = ({ cashbookId }) => {
     };
   }, [transactions, filters.startDate, filters.endDate, filters.type]);
 
-  const shareViaEmail = () => {
+  const buildReportFile = () => {
+    const safeStart = String(filters.startDate || '').replace(/\//g, '-');
+    const safeEnd = String(filters.endDate || '').replace(/\//g, '-');
+    const fileName = `cash-book-report_${safeStart}_to_${safeEnd}.pdf`;
+    return new File([pdfBlob], fileName, { type: 'application/pdf' });
+  };
+
+  const trySharePdfFile = async () => {
     if (!pdfBlob) {
       setMessage({ type: 'error', text: 'Please generate PDF first' });
-      return;
+      return false;
     }
 
+    const file = buildReportFile();
+    const shareData = {
+      title: 'Cash Book Report',
+      text: `Cash Book Report from ${filters.startDate} to ${filters.endDate}`,
+      files: [file],
+    };
+
+    const canShareFiles =
+      typeof navigator !== 'undefined' &&
+      typeof navigator.share === 'function' &&
+      (typeof navigator.canShare !== 'function' || navigator.canShare({ files: [file] }));
+
+    if (!canShareFiles) return false;
+
+    try {
+      await navigator.share(shareData);
+      setMessage({ type: 'success', text: 'PDF shared successfully.' });
+      return true;
+    } catch (err) {
+      // User cancelled share or share failed.
+      const msg = err?.name === 'AbortError' ? 'Share cancelled.' : 'Could not share PDF.';
+      setMessage({ type: 'error', text: msg });
+      return true;
+    }
+  };
+
+  const shareViaEmail = async () => {
+    const didShare = await trySharePdfFile();
+    if (didShare) return;
+
     const subject = encodeURIComponent('Cash Book Report');
-    const body = encodeURIComponent(`Cash Book Report from ${filters.startDate} to ${filters.endDate}`);
+    const body = encodeURIComponent(`Cash Book Report from ${filters.startDate} to ${filters.endDate}.\n\nPlease attach the downloaded PDF.`);
     const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
-    
-    // Create a temporary link to attach the PDF
-    const url = window.URL.createObjectURL(pdfBlob);
     window.open(mailtoLink);
-    
-    // Note: Direct attachment via mailto is limited, user will need to attach manually
+
     setMessage({ type: 'success', text: 'Email client opened. Please attach the downloaded PDF manually.' });
   };
 
-  const shareViaWhatsApp = () => {
-    if (!pdfBlob) {
-      setMessage({ type: 'error', text: 'Please generate PDF first' });
-      return;
-    }
+  const shareViaWhatsApp = async () => {
+    const didShare = await trySharePdfFile();
+    if (didShare) return;
 
-    const text = encodeURIComponent(`Cash Book Report from ${filters.startDate} to ${filters.endDate}\n\nPlease check the downloaded PDF file.`);
+    const text = encodeURIComponent(
+      `Cash Book Report from ${filters.startDate} to ${filters.endDate}\n\nPlease attach the downloaded PDF.`
+    );
     const whatsappLink = `https://wa.me/?text=${text}`;
     window.open(whatsappLink, '_blank');
-    
-    setMessage({ type: 'success', text: 'WhatsApp opened. Please share the downloaded PDF file manually.' });
+
+    setMessage({ type: 'success', text: 'WhatsApp opened. Please attach the downloaded PDF manually.' });
   };
 
   if (!cashbookId) {

@@ -61,10 +61,56 @@ const CashbookView = () => {
       setRecentLoading(true);
       const data = await transactionAPI.getAll(cashbookId, {
         sortBy: 'date',
-        sortOrder: 'DESC',
+        sortOrder: 'ASC',
       });
       const arr = Array.isArray(data) ? data : [];
-      setRecentTransactions(arr.slice(0, 5));
+
+      const chronological = [...arr].sort((a, b) => {
+        const dateDiff = new Date(a.date) - new Date(b.date);
+        if (dateDiff !== 0) return dateDiff;
+
+        const aCreated = a.created_at ? new Date(a.created_at) : null;
+        const bCreated = b.created_at ? new Date(b.created_at) : null;
+        if (aCreated && bCreated) {
+          const createdDiff = aCreated - bCreated;
+          if (createdDiff !== 0) return createdDiff;
+        }
+
+        return Number(a.id) - Number(b.id);
+      });
+
+      let balance = 0;
+      const balanceById = new Map();
+      for (const t of chronological) {
+        const amount = Number(t.amount || 0);
+        if (t.type === 'inflow') {
+          balance += amount;
+        } else {
+          balance -= amount;
+        }
+        balanceById.set(t.id, balance);
+      }
+
+      const desc = [...arr].sort((a, b) => {
+        const dateDiff = new Date(b.date) - new Date(a.date);
+        if (dateDiff !== 0) return dateDiff;
+
+        const aCreated = a.created_at ? new Date(a.created_at) : null;
+        const bCreated = b.created_at ? new Date(b.created_at) : null;
+        if (aCreated && bCreated) {
+          const createdDiff = bCreated - aCreated;
+          if (createdDiff !== 0) return createdDiff;
+        }
+
+        return Number(b.id) - Number(a.id);
+      });
+
+      const latestFive = desc.slice(0, 5).map((t) => ({
+        ...t,
+        runningBalance: Number(balanceById.get(t.id) ?? 0),
+      }));
+
+      setRecentTransactions(latestFive);
     } catch (error) {
       console.error('Error fetching recent transactions:', error);
       setRecentTransactions([]);
@@ -148,6 +194,7 @@ const CashbookView = () => {
     }
   };
 
+
   if (isGuest) {
     return <GuestView />;
   }
@@ -224,41 +271,60 @@ const CashbookView = () => {
                         No recent transactions yet.
                       </div>
                     ) : (
-                      <div className="divide-y divide-gray-200">
-                        {recentTransactions.map((t) => {
-                          const decoded = decodeDescription(t.description || '');
-                          const sign = t.type === 'inflow' ? '+' : '-';
-                          const amountClass = t.type === 'inflow' ? 'text-emerald-700' : 'text-rose-700';
-                          const typePill = t.type === 'inflow'
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-rose-100 text-rose-800';
-
-                          return (
-                            <div key={t.id} className="px-4 sm:px-6 py-3 bg-white bg-opacity-60 hover:bg-opacity-80 transition">
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="min-w-0">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <span className={`px-2 py-0.5 text-[11px] rounded-full font-semibold ${typePill}`}>{t.type}</span>
-                                    {decoded.category && (
-                                      <span className="px-2 py-0.5 text-[11px] rounded-full bg-indigo-100 text-indigo-800 font-semibold">
-                                        {decoded.category}
-                                      </span>
-                                    )}
-                                    <span className="text-sm text-gray-900 truncate max-w-[44ch]">
-                                      {decoded.description || 'No description'}
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                              <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                              <th className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                              <th className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Description</th>
+                              <th className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Balance</th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {recentTransactions.map((t) => {
+                              const decoded = decodeDescription(t.description || '');
+                              return (
+                                <tr key={t.id} className="hover:bg-gray-50">
+                                  <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{t.date}</td>
+                                  <td className="px-2 sm:px-4 py-3">
+                                    <span className={`px-2 py-1 text-xs rounded-full ${
+                                      t.type === 'inflow'
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-red-100 text-red-800'
+                                    }`}>
+                                      {t.type}
                                     </span>
-                                  </div>
-                                  <div className="mt-1 text-xs text-gray-500">
-                                    {t.date}
-                                  </div>
-                                </div>
-                                <div className={`text-sm sm:text-base font-extrabold ${amountClass} whitespace-nowrap`}>
-                                  {sign}Rs {Number(t.amount || 0).toFixed(2)}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
+                                  </td>
+                                  <td className="px-2 sm:px-4 py-3 text-sm font-medium text-gray-900 text-right tabular-nums whitespace-nowrap">
+                                    Rs {Number(t.amount || 0).toFixed(2)}
+                                  </td>
+                                  <td className="px-2 sm:px-4 py-3 text-sm text-gray-500 hidden sm:table-cell text-center">
+                                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                                      {decoded.category && (
+                                        <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 font-semibold">
+                                          {decoded.category}
+                                        </span>
+                                      )}
+                                      <span>{decoded.description || '-'}</span>
+                                    </div>
+                                  </td>
+                                  <td className="px-2 sm:px-4 py-3 text-sm font-semibold text-right tabular-nums whitespace-nowrap">
+                                    {(() => {
+                                      const bal = Number(t.runningBalance || 0);
+                                      return (
+                                        <span className={bal >= 0 ? 'text-emerald-700' : 'text-rose-700'}>
+                                          Rs {bal.toFixed(2)}
+                                        </span>
+                                      );
+                                    })()}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </div>
                     )}
                   </div>

@@ -57,7 +57,7 @@ const GuestView = () => {
               <div className="bg-white bg-opacity-95 p-6 rounded-lg shadow-xl border-2 border-purple-300">
                 <div className="text-4xl mb-3">📜</div>
                 <h3 className="font-semibold text-purple-800 mb-2 text-lg">View History</h3>
-                <p className="text-sm text-purple-700">See chronological records with running balance</p>
+                <p className="text-sm text-purple-700">See chronological transaction records</p>
               </div>
               
               <div className="bg-white bg-opacity-95 p-6 rounded-lg shadow-xl border-2 border-indigo-300">

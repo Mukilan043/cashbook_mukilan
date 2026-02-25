@@ -1,7 +1,14 @@
 import axios from 'axios';
 import { cacheDelByPrefix, withOfflineCache } from '../utils/offlineCache';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://happy-prosperity-production.up.railway.app/api';
+const PROD_API_BASE_URL = 'https://happy-prosperity-production.up.railway.app/api';
+
+const isLocalhost =
+  typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+// If running locally, prefer relative '/api' so Vite's proxy (vite.config.js) routes to the backend.
+const API_BASE_URL = import.meta.env.VITE_API_URL || (isLocalhost ? '/api' : PROD_API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -34,6 +41,14 @@ export const authAPI = {
   },
   login: async (email, password) => {
     const response = await api.post('/auth/login', { email, password });
+    return response.data;
+  },
+  forgotPasswordVerify: async (email) => {
+    const response = await api.post('/auth/forgot-password/verify', { email });
+    return response.data;
+  },
+  resetPassword: async (email, newPassword) => {
+    const response = await api.post('/auth/forgot-password/reset', { email, newPassword });
     return response.data;
   },
   getProfile: async () => {

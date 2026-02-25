@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { transactionAPI } from '../services/api';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { decodeDescription } from '../utils/transactionSmart';
 
 const History = ({ cashbookId }) => {
@@ -34,33 +34,34 @@ const History = ({ cashbookId }) => {
     }
   };
 
-  // Group transactions by date
-  const groupedTransactions = transactions.reduce((groups, transaction) => {
-    const date = transaction.date;
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push(transaction);
-    return groups;
-  }, {});
+  const runningBalanceById = (() => {
+    const chronological = [...transactions].sort((a, b) => {
+      const dateDiff = new Date(a.date) - new Date(b.date);
+      if (dateDiff !== 0) return dateDiff;
 
-  // Calculate running balance
-  const calculateRunningBalance = (transactionsList) => {
-    let balance = 0;
-    return transactionsList.map(transaction => {
-      if (transaction.type === 'inflow') {
-        balance += transaction.amount;
-      } else {
-        balance -= transaction.amount;
+      const aCreated = a.created_at ? new Date(a.created_at) : null;
+      const bCreated = b.created_at ? new Date(b.created_at) : null;
+      if (aCreated && bCreated) {
+        const createdDiff = aCreated - bCreated;
+        if (createdDiff !== 0) return createdDiff;
       }
-      return { ...transaction, runningBalance: balance };
-    });
-  };
 
-  // Sort dates in descending order
-  const sortedDates = Object.keys(groupedTransactions).sort((a, b) => 
-    new Date(b) - new Date(a)
-  );
+      return Number(a.id) - Number(b.id);
+    });
+
+    let balance = 0;
+    const map = new Map();
+    for (const transaction of chronological) {
+      const amount = Number(transaction.amount || 0);
+      if (transaction.type === 'inflow') {
+        balance += amount;
+      } else {
+        balance -= amount;
+      }
+      map.set(transaction.id, balance);
+    }
+    return map;
+  })();
 
   if (!cashbookId) {
     return (
@@ -110,77 +111,69 @@ const History = ({ cashbookId }) => {
         </div>
       </div>
 
-      {sortedDates.length === 0 ? (
+      {transactions.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           No transaction history found
         </div>
       ) : (
-        <div className="space-y-4">
-          {sortedDates.map((date) => {
-            const dayTransactions = calculateRunningBalance(
-              groupedTransactions[date].sort((a, b) => 
-                new Date(b.created_at) - new Date(a.created_at)
-              )
-            );
-
-            return (
-              <div key={date} className="bg-gray-50 border border-gray-200 rounded-lg">
-                <div className="px-4 py-2 border-b border-gray-200">
-                  <h3 className="font-semibold text-gray-700">
-                    {format(parseISO(date), 'EEEE, MMMM dd, yyyy')}
-                  </h3>
-                </div>
-                <div className="divide-y divide-gray-200">
-                  {dayTransactions.map((transaction) => (
-                    <div
-                      key={transaction.id}
-                      className="px-4 py-3 bg-white hover:bg-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            transaction.type === 'inflow'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {transaction.type}
-                          </span>
-                          {(() => {
-                            const decoded = decodeDescription(transaction.description || '');
-                            return (
-                              <>
-                                {decoded.category && (
-                                  <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 font-semibold">
-                                    {decoded.category}
-                                  </span>
-                                )}
-                                <span className="text-sm text-gray-900">
-                                  {decoded.description || 'No description'}
-                                </span>
-                              </>
-                            );
-                          })()}
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                <th className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                <th className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Description</th>
+                <th className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Balance</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {transactions.map((transaction) => (
+                <tr key={transaction.id} className="hover:bg-gray-50">
+                  <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                    {format(new Date(transaction.date), 'MMM dd, yyyy')}
+                  </td>
+                  <td className="px-2 sm:px-4 py-3">
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      transaction.type === 'inflow'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {transaction.type}
+                    </span>
+                  </td>
+                  <td className="px-2 sm:px-4 py-3 text-sm font-medium text-gray-900 text-right tabular-nums whitespace-nowrap">
+                    Rs {Number(transaction.amount || 0).toFixed(2)}
+                  </td>
+                  <td className="px-2 sm:px-4 py-3 text-sm text-gray-500 hidden sm:table-cell text-center">
+                    {(() => {
+                      const decoded = decodeDescription(transaction.description || '');
+                      return (
+                        <div className="flex items-center justify-center gap-2 flex-wrap">
+                          {decoded.category && (
+                            <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 font-semibold">
+                              {decoded.category}
+                            </span>
+                          )}
+                          <span>{decoded.description || '-'}</span>
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {format(parseISO(transaction.created_at), 'hh:mm a')}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className={`text-sm font-semibold ${
-                          transaction.type === 'inflow' ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {transaction.type === 'inflow' ? '+' : '-'}Rs {transaction.amount.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Balance: Rs {transaction.runningBalance.toFixed(2)}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+                      );
+                    })()}
+                  </td>
+                  <td className="px-2 sm:px-4 py-3 text-sm font-semibold text-right tabular-nums whitespace-nowrap">
+                    {(() => {
+                      const bal = Number(runningBalanceById.get(transaction.id) ?? 0);
+                      return (
+                        <span className={bal >= 0 ? 'text-emerald-700' : 'text-rose-700'}>
+                          Rs {bal.toFixed(2)}
+                        </span>
+                      );
+                    })()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
