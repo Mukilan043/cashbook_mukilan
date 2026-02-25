@@ -49,7 +49,7 @@ function initializeDatabase() {
     }
   });
 
-  // Transactions table (updated with cashbook_id)
+  // Transactions table
   db.run(`
     CREATE TABLE IF NOT EXISTS transactions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,9 +66,7 @@ function initializeDatabase() {
       console.error('Error creating transactions table:', err.message);
     } else {
       console.log('Transactions table ready');
-      // Migrate existing transactions table if cashbook_id column doesn't exist
       migrateTransactionsTable();
-      // Migrate users table if profile_image doesn't exist
       migrateUsersTable();
     }
   });
@@ -94,30 +92,24 @@ function migrateUsersTable() {
 }
 
 function migrateTransactionsTable() {
-  // Check if cashbook_id column exists
-  db.all("PRAGMA table_info(transactions)", (err, columns) => {
+  db.all('PRAGMA table_info(transactions)', (err, columns) => {
     if (err) {
       console.error('Error checking table info:', err.message);
       return;
     }
-    
+
     const hasCashbookId = columns.some(col => col.name === 'cashbook_id');
-    
+
     if (!hasCashbookId) {
       console.log('Migrating transactions table: adding cashbook_id column...');
-      // First, create a default cashbook for existing transactions if needed
-      db.run(`
-        ALTER TABLE transactions ADD COLUMN cashbook_id INTEGER
-      `, (err) => {
+      db.run('ALTER TABLE transactions ADD COLUMN cashbook_id INTEGER', (err) => {
         if (err) {
           console.error('Error adding cashbook_id column:', err.message);
-          // If column already exists or other error, try to recreate table
           recreateTransactionsTable();
         } else {
           console.log('Successfully added cashbook_id column');
-          // Set default cashbook_id for existing transactions (if any)
           db.run(`
-            UPDATE transactions 
+            UPDATE transactions
             SET cashbook_id = (SELECT id FROM cashbooks LIMIT 1)
             WHERE cashbook_id IS NULL
           `, (err) => {
@@ -132,7 +124,6 @@ function migrateTransactionsTable() {
 }
 
 function recreateTransactionsTable() {
-  // Backup and recreate table if migration fails
   db.run(`
     CREATE TABLE IF NOT EXISTS transactions_new (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -150,7 +141,7 @@ function recreateTransactionsTable() {
     } else {
       db.run(`
         INSERT INTO transactions_new (id, cashbook_id, type, amount, description, date, created_at)
-        SELECT id, 
+        SELECT id,
                COALESCE(cashbook_id, (SELECT id FROM cashbooks LIMIT 1)),
                type, amount, description, date, created_at
         FROM transactions
@@ -184,4 +175,3 @@ function closeDb() {
 }
 
 module.exports = { getDb, closeDb };
-

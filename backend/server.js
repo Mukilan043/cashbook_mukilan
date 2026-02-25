@@ -6,9 +6,9 @@ const transactionRoutes = require('./routes/transactions');
 const authRoutes = require('./routes/auth');
 const cashbookRoutes = require('./routes/cashbooks');
 const assistantRoutes = require('./routes/assistant');
-
+const debugRoutes = require('./routes/debug');
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
@@ -20,6 +20,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cashbooks', cashbookRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/assistant', assistantRoutes);
+app.use('/api/debug', debugRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
