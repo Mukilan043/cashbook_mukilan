@@ -2,11 +2,13 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const initDb = require("./database/initDB");
 const transactionRoutes = require('./routes/transactions');
 const authRoutes = require('./routes/auth');
 const cashbookRoutes = require('./routes/cashbooks');
 const assistantRoutes = require('./routes/assistant');
 const debugRoutes = require('./routes/debug');
+const initDB = require('./database/initDB');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -32,9 +34,11 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
+app.listen(PORT, async () => {
+  console.log(`Server running on port ${PORT}`);
+  await initDB();
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+
+
+  
 });
-
