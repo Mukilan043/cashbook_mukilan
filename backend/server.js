@@ -33,11 +33,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
-app.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
-  await initDB();
+// Initialize DB before handling requests
+initDB();
 
-
-
-  
-});
+module.exports = app;
