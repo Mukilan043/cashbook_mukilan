@@ -2,7 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const initDB = require('./database/initDB');
+const initDB = require('./database/initDb');
 const transactionRoutes = require('./routes/transactions');
 const authRoutes = require('./routes/auth');
 const cashbookRoutes = require('./routes/cashbooks');
