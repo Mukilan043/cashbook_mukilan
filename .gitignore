@@ -1,3 +1,9 @@
 node_modules/
 target/
 .env
+
+# Local SQLite database files (generated)
+backend/database/*.sqlite
+backend/database/*.sqlite-journal
+backend/database/*.db
+backend/database/*.db-journal

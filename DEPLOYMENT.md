@@ -155,7 +155,7 @@ Then open the preview URL, login and open a cashbook once (to cache data), switc
 ### Database
 
 The SQLite database will be created automatically at:
-`backend/database/cashbook.db`
+`backend/database/cashbook.sqlite`
 
 Make sure the `backend/database/` directory is writable:
 ```bash

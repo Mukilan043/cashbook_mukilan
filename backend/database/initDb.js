@@ -1,46 +1,59 @@
-const pool = require("./db");
+const { getDb } = require('./db');
+
+function run(db, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, (err) => {
+      if (err) return reject(err);
+      resolve();
+    });
+  });
+}
 
 async function initDB() {
+  const db = getDb();
   try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(100) UNIQUE NOT NULL,
-        email VARCHAR(150) UNIQUE NOT NULL,
-        mobile VARCHAR(20) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
+    await run(
+      db,
+      `CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        mobile TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
         profile_image TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )`
+    );
 
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS cashbooks (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        name VARCHAR(100) NOT NULL,
+    await run(
+      db,
+      `CREATE TABLE IF NOT EXISTS cashbooks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
         description TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-      )
-    `);
+      )`
+    );
 
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS transactions (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        cashbook_id INT NOT NULL,
-        type ENUM('inflow','outflow') NOT NULL,
-        amount DECIMAL(10,2) NOT NULL,
+    await run(
+      db,
+      `CREATE TABLE IF NOT EXISTS transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cashbook_id INTEGER NOT NULL,
+        type TEXT NOT NULL CHECK (type IN ('inflow', 'outflow')),
+        amount REAL NOT NULL,
         description TEXT,
-        date DATE NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        date TEXT NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (cashbook_id) REFERENCES cashbooks(id) ON DELETE CASCADE
-      )
-    `);
+      )`
+    );
 
-    console.log("✅ MySQL tables ready");
+    console.log('✅ SQLite tables ready');
   } catch (err) {
-    console.error("❌ DB init error:", err);
+    console.error('❌ DB init error:', err);
   }
 }
 
