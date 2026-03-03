@@ -2,7 +2,15 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const initDB = require('./database/initDB');
+const fs = require('fs');
+const path = require('path');
+
+const initDbPath = path.join(__dirname, 'database', 'initDB.js');
+if (!fs.existsSync(initDbPath)) {
+  console.error(`❌ Missing initDB at ${initDbPath}. Make sure backend/database/initDB.js is committed.`);
+  process.exit(1);
+}
+const initDB = require(initDbPath);
 const transactionRoutes = require('./routes/transactions');
 const authRoutes = require('./routes/auth');
 const cashbookRoutes = require('./routes/cashbooks');
@@ -15,7 +23,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://cashbook-mukilan.vercel.app"
+    "https://cashbook-mukilan.vercel.app",
+    "https://cashbook-mukilan.onrender.com"
   ],
   credentials: true
 }));
