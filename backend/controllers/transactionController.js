@@ -8,6 +8,14 @@ function decodeCategoryFromDescription(value) {
   return { category: (match[1] || '').trim(), description: (match[2] || '').trim() };
 }
 
+function normalizeTransaction(row) {
+  if (!row) return row;
+  return {
+    ...row,
+    amount: Number(row.amount || 0),
+  };
+}
+
 // Get all transactions for a cashbook
 const getAllTransactions = async (req, res) => {
   const db = getDb();
@@ -48,7 +56,7 @@ const getAllTransactions = async (req, res) => {
     query += ` ORDER BY ${sortField} ${order}, created_at DESC`;
 
     const result = await db.query(query, params);
-    return res.json(result.rows);
+    return res.json(result.rows.map(normalizeTransaction));
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -66,7 +74,7 @@ const getTransactionById = async (req, res) => {
        WHERE t.id = $1 AND t.cashbook_id = $2 AND c.user_id = $3`,
       [id, cashbookId, req.user.id]
     );
-    const row = result.rows[0];
+    const row = normalizeTransaction(result.rows[0]);
     if (!row) {
       return res.status(404).json({ error: 'Transaction not found' });
     }
@@ -109,7 +117,14 @@ const createTransaction = async (req, res) => {
       [cashbookId, type, amount, description || null, date]
     );
     const row = insert.rows[0];
-    return res.status(201).json({ id: row.id, cashbook_id: cashbookId, type, amount, description, date });
+    return res.status(201).json({
+      id: row.id,
+      cashbook_id: cashbookId,
+      type,
+      amount: Number(amount || 0),
+      description,
+      date,
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
