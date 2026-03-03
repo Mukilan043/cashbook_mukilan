@@ -1,20 +1,15 @@
-const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
 
-let dbInstance;
+let pool;
 
 function getDb() {
-	if (dbInstance) return dbInstance;
-
-	const dbPath =
-		process.env.SQLITE_DB_PATH || path.join(__dirname, 'cashbook.sqlite');
-
-	dbInstance = new sqlite3.Database(dbPath);
-	dbInstance.serialize(() => {
-		dbInstance.run('PRAGMA foreign_keys = ON');
-	});
-
-	return dbInstance;
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+  }
+  return pool;
 }
 
 module.exports = { getDb };

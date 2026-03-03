@@ -85,26 +85,18 @@ async function openAIChat({ apiKey, model, messages, responseFormatJson = false 
   return typeof content === 'string' ? content : '';
 }
 
-function dbAll(db, sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) return reject(err);
-      resolve(rows);
-    });
-  });
+async function dbAll(db, sql, params = []) {
+  const result = await db.query(sql, params);
+  return result.rows;
 }
 
-function dbGet(db, sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) return reject(err);
-      resolve(row);
-    });
-  });
+async function dbGet(db, sql, params = []) {
+  const result = await db.query(sql, params);
+  return result.rows[0];
 }
 
 async function listCashbooksForUser(db, userId) {
-  return dbAll(db, 'SELECT id, name, description, created_at FROM cashbooks WHERE user_id = ? ORDER BY created_at DESC', [userId]);
+  return dbAll(db, 'SELECT id, name, description, created_at FROM cashbooks WHERE user_id = $1 ORDER BY created_at DESC', [userId]);
 }
 
 async function getAllTimeBalance(db, { userId, cashbookId }) {
@@ -116,7 +108,7 @@ async function getAllTimeBalance(db, { userId, cashbookId }) {
       COALESCE(SUM(CASE WHEN t.type = 'inflow' THEN t.amount ELSE -t.amount END), 0) as balance
     FROM transactions t
     INNER JOIN cashbooks c ON t.cashbook_id = c.id
-    WHERE t.cashbook_id = ? AND c.user_id = ?`,
+    WHERE t.cashbook_id = $1 AND c.user_id = $2`,
     [cashbookId, userId]
   );
 }
@@ -126,8 +118,8 @@ async function getTransactionsInRange(db, { userId, cashbookId, startDate, endDa
     db,
     `SELECT t.* FROM transactions t
      INNER JOIN cashbooks c ON t.cashbook_id = c.id
-     WHERE t.cashbook_id = ? AND c.user_id = ?
-       AND t.date >= ? AND t.date <= ?
+     WHERE t.cashbook_id = $1 AND c.user_id = $2
+       AND t.date >= $3 AND t.date <= $4
      ORDER BY t.date ASC, t.created_at ASC`,
     [cashbookId, userId, startDate, endDate]
   );
@@ -139,7 +131,7 @@ async function getRecentTransactions(db, { userId, cashbookId, limit = 5 }) {
     db,
     `SELECT t.* FROM transactions t
      INNER JOIN cashbooks c ON t.cashbook_id = c.id
-     WHERE t.cashbook_id = ? AND c.user_id = ?
+     WHERE t.cashbook_id = $1 AND c.user_id = $2
      ORDER BY t.date DESC, t.created_at DESC
      LIMIT ${lim}`,
     [cashbookId, userId]
@@ -385,7 +377,7 @@ function isNameQuestion(text) {
 }
 
 async function getUserProfileById(db, userId) {
-  return dbGet(db, 'SELECT id, username, email, mobile FROM users WHERE id = ?', [userId]);
+  return dbGet(db, 'SELECT id, username, email, mobile FROM users WHERE id = $1', [userId]);
 }
 
 function isCapabilitiesQuestion(text) {
@@ -506,7 +498,7 @@ async function getTransactionCountAllTime(db, { userId, cashbookId }) {
     `SELECT COUNT(*) as cnt
      FROM transactions t
      INNER JOIN cashbooks c ON t.cashbook_id = c.id
-     WHERE t.cashbook_id = ? AND c.user_id = ?`,
+     WHERE t.cashbook_id = $1 AND c.user_id = $2`,
     [cashbookId, userId]
   );
   return Number(row?.cnt || 0);

@@ -2,31 +2,46 @@ const express = require('express');
 const router = express.Router();
 const { getDb } = require('../database/db');
 
-// View all users
-router.get('/users', (req, res) => {
+router.get('/tables', async (req, res) => {
   const db = getDb();
-  db.all('SELECT * FROM users', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
+  try {
+    const result = await db.query(
+      "SELECT table_name AS name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name"
+    );
+    return res.json(result.rows);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 });
 
-// View all cashbooks
-router.get('/cashbooks', (req, res) => {
+router.get('/users', async (req, res) => {
   const db = getDb();
-  db.all('SELECT * FROM cashbooks', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
+  try {
+    const result = await db.query('SELECT * FROM users');
+    return res.json(result.rows);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 });
 
-// View all transactions
-router.get('/transactions', (req, res) => {
+router.get('/cashbooks', async (req, res) => {
   const db = getDb();
-  db.all('SELECT * FROM transactions', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
+  try {
+    const result = await db.query('SELECT * FROM cashbooks');
+    return res.json(result.rows);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/transactions', async (req, res) => {
+  const db = getDb();
+  try {
+    const result = await db.query('SELECT * FROM transactions');
+    return res.json(result.rows);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
