@@ -5,8 +5,13 @@ import './index.css'
 
 import { registerSW } from 'virtual:pwa-register'
 
-registerSW({
+const updateSW = registerSW({
   immediate: true,
+  onNeedRefresh() {
+    // Force refresh when a new service worker is available.
+    updateSW(true);
+    window.location.reload();
+  },
 });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
