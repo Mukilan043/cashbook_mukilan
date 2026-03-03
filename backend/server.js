@@ -20,12 +20,28 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://cashbook-mukilan.vercel.app",
+  "https://cashbook-mukilan.onrender.com"
+];
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  try {
+    const { hostname } = new URL(origin);
+    return hostname.endsWith('.vercel.app');
+  } catch {
+    return false;
+  }
+}
+
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://cashbook-mukilan.vercel.app",
-    "https://cashbook-mukilan.onrender.com"
-  ],
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
