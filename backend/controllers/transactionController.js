@@ -224,7 +224,12 @@ const getBalance = async (req, res) => {
        WHERE cashbook_id = $1`,
       [cashbookId]
     );
-    return res.json(result.rows[0]);
+    const row = result.rows[0] || {};
+    return res.json({
+      totalInflow: Number(row.totalinflow ?? row.totalInflow ?? 0),
+      totalOutflow: Number(row.totaloutflow ?? row.totalOutflow ?? 0),
+      balance: Number(row.balance ?? 0),
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
