@@ -17,6 +17,7 @@ import BottomNavigation from './components/BottomNavigation';
 import BackButton from './components/BackButton';
 import { cashbookAPI } from './services/api';
 import { decodeDescription } from './utils/transactionSmart';
+import { formatDateDisplay } from './utils/dateFormat';
 import { transactionAPI } from './services/api';
 import CashbookAssistant from './components/CashbookAssistant';
 
@@ -287,7 +288,7 @@ const CashbookView = () => {
                               const decoded = decodeDescription(t.description || '');
                               return (
                                 <tr key={t.id} className="hover:bg-gray-50">
-                                  <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{t.date}</td>
+                                  <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{formatDateDisplay(t.date)}</td>
                                   <td className="px-2 sm:px-4 py-3">
                                     <span className={`px-2 py-1 text-xs rounded-full ${
                                       t.type === 'inflow'

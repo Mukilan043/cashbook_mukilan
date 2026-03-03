@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { transactionAPI } from '../services/api';
-import { format } from 'date-fns';
+import { formatDateDisplay } from '../utils/dateFormat';
 import { decodeDescription } from '../utils/transactionSmart';
 
 const History = ({ cashbookId }) => {
@@ -131,7 +131,7 @@ const History = ({ cashbookId }) => {
               {transactions.map((transaction) => (
                 <tr key={transaction.id} className="hover:bg-gray-50">
                   <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
-                    {format(new Date(transaction.date), 'MMM dd, yyyy')}
+                    {formatDateDisplay(transaction.date)}
                   </td>
                   <td className="px-2 sm:px-4 py-3">
                     <span className={`px-2 py-1 text-xs rounded-full ${

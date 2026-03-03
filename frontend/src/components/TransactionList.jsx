@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { transactionAPI } from '../services/api';
-import { format } from 'date-fns';
+import { formatDateDisplay, toDateOnly } from '../utils/dateFormat';
 import {
   DEFAULT_CATEGORIES,
   decodeDescription,
@@ -67,7 +67,7 @@ const TransactionList = ({ cashbookId }) => {
       description: decoded.description || '',
       category: decoded.category || '',
       customCategory: '',
-      date: transaction.date,
+      date: toDateOnly(transaction.date),
       type: transaction.type,
     });
   };
@@ -348,7 +348,7 @@ const TransactionList = ({ cashbookId }) => {
                     ) : (
                       <>
                         <td className="px-2 sm:px-4 py-3 text-sm text-gray-900">
-                          {format(new Date(transaction.date), 'MMM dd, yyyy')}
+                          {formatDateDisplay(transaction.date)}
                         </td>
                         <td className="px-2 sm:px-4 py-3">
                           <span className={`px-2 py-1 text-xs rounded-full ${
@@ -360,7 +360,7 @@ const TransactionList = ({ cashbookId }) => {
                           </span>
                         </td>
                         <td className="px-2 sm:px-4 py-3 text-sm font-medium text-gray-900">
-                          Rs {transaction.amount.toFixed(2)}
+                          Rs {Number(transaction.amount || 0).toFixed(2)}
                         </td>
                         <td className="px-2 sm:px-4 py-3 text-sm text-gray-500 hidden sm:table-cell">
                           {(() => {
