@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { cacheDelByPrefix, withOfflineCache } from '../utils/offlineCache';
 
-const PROD_API_BASE_URL = 'https://happy-prosperity-production.up.railway.app/api';
+const PROD_API_BASE_URL = 'https://cashbook-mukilan.onrender.com/api';
 
 const isLocalhost =
   typeof window !== 'undefined' &&

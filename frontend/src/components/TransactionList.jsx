@@ -156,7 +156,7 @@ const TransactionList = ({ cashbookId }) => {
                   startDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0],
                   endDate: new Date().toISOString().split('T')[0],
                 };
-                const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+                const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://cashbook-mukilan.onrender.com/api';
                 const token = localStorage.getItem('token');
                 const response = await fetch(
                   `${API_BASE_URL}/transactions/cashbook/${cashbookId}/reports/generate?${new URLSearchParams(reportFilters)}`,
