@@ -271,7 +271,7 @@ const ReportGenerator = ({ cashbookId }) => {
       }
 
       // Fetch PDF as blob using API service
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://cashbook-mukilan.onrender.com/api';
+      const { API_BASE_URL } = await import('../services/api');
       const token = localStorage.getItem('token');
       const response = await fetch(
         `${API_BASE_URL}/transactions/cashbook/${cashbookId}/reports/generate?${new URLSearchParams(reportFilters)}`,
