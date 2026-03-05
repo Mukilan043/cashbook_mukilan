@@ -5,7 +5,6 @@ import BalanceDisplay from './components/BalanceDisplay';
 import Sidebar from './components/Sidebar';
 import CashInflow from './components/CashInflow';
 import CashOutflow from './components/CashOutflow';
-import TransactionList from './components/TransactionList';
 import History from './components/History';
 import ReportGenerator from './components/ReportGenerator';
 import CreateCashbook from './components/CreateCashbook';
@@ -120,12 +119,11 @@ const CashbookView = () => {
     }
   };
 
-  // Close inflow/outflow panel when navigating to other pages (history/manage/report)
+  // Close inflow/outflow panel when navigating to other pages (history/report)
   useEffect(() => {
     if (!cashbookId) return;
     const path = location.pathname;
     const shouldCloseInlinePanels =
-      path.includes('/manage') ||
       path.includes('/history') ||
       path.includes('/report');
 
@@ -184,7 +182,7 @@ const CashbookView = () => {
 
   const handleSidebarSuccess = () => {
     if (window.refreshBalance) window.refreshBalance();
-    // Refresh transactions if on manage/history page
+    // Refresh transactions if on history page
     window.location.reload();
   };
 
@@ -366,15 +364,6 @@ const CashbookView = () => {
 
           {/* Routes */}
           <Routes>
-            <Route 
-              path="manage" 
-              element={
-                <div>
-                  <BackButton />
-                  <TransactionList cashbookId={cashbookId} />
-                </div>
-              } 
-            />
             <Route 
               path="history" 
               element={
@@ -641,7 +630,7 @@ const HomePage = () => {
           ) : cashbooks.length === 0 ? (
             <div className="mt-6 sm:mt-8">
               <div className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-2xl shadow-2xl backdrop-blur p-8 sm:p-10 text-center">
-                <div className="text-4xl sm:text-5xl mb-3">📚</div>
+                <div className="text-3xl sm:text-4xl mb-3 font-bold text-white">CB</div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-white drop-shadow mb-2">No cashbooks yet</h2>
                 <p className="text-white text-opacity-90">Tap <span className="font-semibold">New Cashbook</span> to create your first cashbook.</p>
               </div>

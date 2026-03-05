@@ -270,21 +270,7 @@ const ReportGenerator = ({ cashbookId }) => {
         reportFilters.type = filters.type;
       }
 
-      // Fetch PDF as blob using API service
-      const { API_BASE_URL } = await import('../services/api');
-      const token = localStorage.getItem('token');
-      const response = await fetch(
-        `${API_BASE_URL}/transactions/cashbook/${cashbookId}/reports/generate?${new URLSearchParams(reportFilters)}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to generate report');
-      
-      const blob = await response.blob();
+      const blob = await transactionAPI.generateReportBlob(cashbookId, reportFilters);
       setPdfBlob(blob);
       
       // Auto download
@@ -562,13 +548,13 @@ const ReportGenerator = ({ cashbookId }) => {
                   onClick={shareViaEmail}
                   className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 shadow-lg"
                 >
-                  📧 Share via Email
+                  Share via Email
                 </button>
                 <button
                   onClick={shareViaWhatsApp}
                   className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-lg"
                 >
-                  💬 Share via WhatsApp
+                  Share via WhatsApp
                 </button>
               </div>
             </div>
@@ -585,7 +571,7 @@ const ReportGenerator = ({ cashbookId }) => {
 
           <div className="mt-6">
             <div className="flex items-center justify-between gap-3 flex-wrap">
-              <h3 className="text-lg font-bold text-gray-900">Analytics</h3>
+              <h3 className="text-lg font-bold text-gray-900">Summary & Insights</h3>
               <div className="text-xs text-gray-500">
                 {analyticsLoading ? 'Loading…' : `Loaded ${transactions.length} transactions`}
               </div>
@@ -616,11 +602,11 @@ const ReportGenerator = ({ cashbookId }) => {
 
             <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
               <DonutChart
-                title={analytics.pieMode === 'inflow' ? 'Category-wise Inflow' : 'Category-wise Expenses'}
+                title={analytics.pieMode === 'inflow' ? 'Income by Category' : 'Spending by Category'}
                 items={analytics.pieItems}
               />
               <BarChart
-                title={analytics.pieMode === 'inflow' ? 'Daily Inflow Trend' : 'Daily Spending Trend'}
+                title={analytics.pieMode === 'inflow' ? 'Daily Income' : 'Daily Spending'}
                 points={analytics.barPoints}
                 colorClass={analytics.pieMode === 'inflow' ? 'text-emerald-500' : 'text-rose-500'}
               />
@@ -629,9 +615,9 @@ const ReportGenerator = ({ cashbookId }) => {
             <div className="mt-4 bg-white bg-opacity-95 rounded-lg border border-gray-200 p-4">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900">Budget & Insights</h3>
+                  <h3 className="text-sm font-semibold text-gray-900">Budget & Forecast</h3>
                   <p className="text-xs text-gray-500 mt-1">
-                    Forecast uses average daily spending across this date range ({analytics.rangeDays} days).
+                    Forecast = average daily spending × number of days in this month ({analytics.rangeDays} days used).
                   </p>
                 </div>
               </div>
@@ -658,25 +644,25 @@ const ReportGenerator = ({ cashbookId }) => {
 
                 <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
-                    <div className="text-xs text-gray-500">Avg / day (outflow)</div>
+                    <div className="text-xs text-gray-500">Average spending per day</div>
                     <div className="text-sm font-bold text-gray-900">{formatMoney(analytics.avgDailyOutflow)}</div>
                   </div>
                   <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
-                    <div className="text-xs text-gray-500">Forecast month ({analytics.monthDays}d)</div>
+                    <div className="text-xs text-gray-500">Estimated spending this month ({analytics.monthDays} days)</div>
                     <div className="text-sm font-bold text-gray-900">{formatMoney(analytics.projectedMonthOutflow)}</div>
                   </div>
                   <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
                     <div className="text-xs text-gray-500">Budget status</div>
                     {monthlyBudget > 0 ? (
                       <div className={`text-sm font-bold ${analytics.projectedMonthOutflow <= monthlyBudget ? 'text-emerald-700' : 'text-rose-700'}`}>
-                        {analytics.projectedMonthOutflow <= monthlyBudget ? 'On track' : 'Over budget'}
+                        {analytics.projectedMonthOutflow <= monthlyBudget ? 'Within budget' : 'Above budget'}
                       </div>
                     ) : (
                       <div className="text-sm font-bold text-gray-700">Set a budget</div>
                     )}
                     {monthlyBudget > 0 && (
                       <div className="text-xs text-gray-500 mt-1">
-                        Remaining: {formatMoney(monthlyBudget - analytics.projectedMonthOutflow)}
+                        Remaining budget: {formatMoney(monthlyBudget - analytics.projectedMonthOutflow)}
                       </div>
                     )}
                   </div>
@@ -686,10 +672,10 @@ const ReportGenerator = ({ cashbookId }) => {
               <div className="mt-3 text-sm text-gray-800">
                 {analytics.topCategory ? (
                   <div>
-                    Top category: <span className="font-semibold">{analytics.topCategory}</span> — {formatMoney(analytics.topCategoryValue)} ({analytics.topCategoryPct}%)
+                    Biggest category: <span className="font-semibold">{analytics.topCategory}</span> — {formatMoney(analytics.topCategoryValue)} ({analytics.topCategoryPct}%)
                   </div>
                 ) : (
-                  <div className="text-gray-500">No category data yet. Add categories in inflow/outflow.</div>
+                  <div className="text-gray-500">No category data yet. Add a category in your transactions.</div>
                 )}
               </div>
             </div>

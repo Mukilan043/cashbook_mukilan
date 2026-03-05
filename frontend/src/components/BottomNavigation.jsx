@@ -6,7 +6,7 @@ const BottomNavigation = ({ cashbookId, onInflowClick, onOutflowClick, activeAct
   const location = useLocation();
   const { isGuest, user } = useAuth();
 
-  // Order: cashbook, inflow, outflow, manage, history, report, profile
+  // Order: cashbook, inflow, outflow, history, report, profile
   const navItems = [
     {
       id: 'cashbook',
@@ -58,24 +58,6 @@ const BottomNavigation = ({ cashbookId, onInflowClick, onOutflowClick, activeAct
       },
       disabled: isGuest || !cashbookId,
       active: activeAction === 'outflow',
-    },
-    {
-      id: 'manage',
-      label: 'Manage',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-      ),
-      onClick: () => {
-        if (cashbookId) {
-          navigate(`/cashbook/${cashbookId}/manage`);
-        } else {
-          alert('Please select a cashbook first');
-        }
-      },
-      disabled: !cashbookId,
-      active: location.pathname.includes('/manage'),
     },
     {
       id: 'history',
@@ -135,7 +117,7 @@ const BottomNavigation = ({ cashbookId, onInflowClick, onOutflowClick, activeAct
       <div className="bg-white bg-opacity-85 border-t border-gray-200 shadow-2xl backdrop-blur">
         <div className="h-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600" />
 
-        <div className="grid grid-cols-7 gap-1 px-1 py-2 max-w-6xl mx-auto">
+        <div className="grid grid-cols-6 gap-1 px-1 py-2 max-w-6xl mx-auto">
           {navItems.map((item) => {
             const isActive = !!item.active;
             const filledGradientClass =

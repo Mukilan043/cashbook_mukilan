@@ -304,76 +304,140 @@ const generateReport = async (req, res) => {
 
     doc.pipe(res);
 
-    try {
+    const userResult = await db.query(
+      'SELECT username, email, mobile FROM users WHERE id = $1',
+      [cashbook.user_id]
+    );
+    const user = userResult.rows[0] || {};
+
+    const invoiceNo = `INV-${cashbookId}-${Date.now().toString().slice(-6)}`;
+    const issueDate = new Date().toLocaleDateString();
+    const periodLabel = startDate || endDate
+      ? `${startDate || 'Beginning'} to ${endDate || 'End'}`
+      : 'All Transactions';
+
+    const EMOJI_REGEX = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu;
+    const normalizeText = (value) => String(value || '')
+      .replace(EMOJI_REGEX, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const splitDescription = (desc) => {
+      const raw = String(desc || '');
+      const match = raw.match(/^\s*\[#([^\]]+)\]\s*(.*)$/);
+      const category = match ? match[1] : '';
+      const text = match ? match[2] : raw;
+      const cleanCategory = normalizeText(category);
+      const cleanText = normalizeText(text);
+      const combined = cleanCategory
+        ? `${cleanCategory}${cleanText ? ' - ' + cleanText : ''}`
+        : (cleanText || '-');
+      return combined || '-';
+    };
+
+    const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+    const leftX = doc.page.margins.left;
+    const rightX = leftX + pageWidth;
+
+    doc.save();
+    doc.rect(leftX, 40, pageWidth, 60).fill('#FFFFFF');
+    doc.restore();
+
+    doc.fontSize(18).fillColor('black').text(cashbook.name, leftX, 50, { align: 'left' });
+    doc.fontSize(10).fillColor('#333333').text('Cash Book Report', leftX, 70);
+
+    doc.fontSize(16).fillColor('black').text('INVOICE', rightX - 150, 50, { width: 150, align: 'right' });
+    doc.fontSize(10).fillColor('#333333').text(`Invoice No: ${invoiceNo}`, rightX - 200, 70, { width: 200, align: 'right' });
+    doc.fontSize(10).fillColor('#333333').text(`Date: ${issueDate}`, rightX - 200, 85, { width: 200, align: 'right' });
+
+    doc.moveTo(leftX, 105).lineTo(rightX, 105).strokeColor('black').stroke();
+    doc.strokeColor('black');
+
+    doc.fontSize(11).fillColor('black').text('Bill To', leftX, 110);
+    doc.fontSize(10).fillColor('#222222').text(`Name: ${normalizeText(user.username) || '-'}`, leftX, 128);
+    doc.fontSize(10).fillColor('#222222').text(`Mobile: ${normalizeText(user.mobile) || '-'}`, leftX, 143);
+    doc.fontSize(10).fillColor('#222222').text(`Email: ${normalizeText(user.email) || '-'}`, leftX, 158);
+
+    doc.fontSize(11).fillColor('black').text('Report Period', rightX - 220, 110, { width: 220, align: 'right' });
+    doc.fontSize(10).fillColor('#222222').text(periodLabel, rightX - 220, 128, { width: 220, align: 'right' });
+    doc.fillColor('black');
+
+    const tableTop = 200;
+    const colWidths = [30, 80, 230, 70, 102];
+    const colX = [leftX];
+    for (let i = 0; i < colWidths.length - 1; i += 1) {
+      colX.push(colX[i] + colWidths[i]);
+    }
+
+    const drawTableHeader = (y) => {
       doc.save();
-      doc.opacity(0.08);
-      doc.fillColor('gray');
-      doc.fontSize(60);
-      doc.rotate(-25, { origin: [300, 300] });
-      doc.text(cashbook.name, 70, 250, { width: 500, align: 'center' });
-      doc.rotate(25, { origin: [300, 300] });
-      doc.opacity(1);
+      doc.rect(leftX, y - 2, pageWidth, 18).fill('#F2F2F2');
       doc.restore();
-    } catch (e) {
-      // ignore watermark errors
-    }
 
-    doc.fontSize(20).text(cashbook.name, { align: 'center' });
-    doc.fontSize(16).text('Cash Book Report', { align: 'center' });
-    doc.moveDown();
+      doc.fontSize(10).fillColor('black');
+      doc.text('S.No', colX[0], y, { width: colWidths[0] });
+      doc.text('Date', colX[1], y, { width: colWidths[1] });
+      doc.text('Description', colX[2], y, { width: colWidths[2] });
+      doc.text('Type', colX[3], y, { width: colWidths[3] });
+      doc.text('Amount', colX[4], y, { width: colWidths[4], align: 'right' });
+      doc.moveTo(leftX, y + 15).lineTo(rightX, y + 15).strokeColor('black').stroke();
+      doc.strokeColor('black');
+    };
 
-    if (startDate || endDate) {
-      doc.fontSize(12).text(
-        `Period: ${startDate || 'Beginning'} to ${endDate || 'End'}`,
-        { align: 'center' }
-      );
-    } else {
-      doc.fontSize(12).text('Period: All Transactions', { align: 'center' });
-    }
-    doc.moveDown(2);
+    drawTableHeader(tableTop);
 
-    doc.fontSize(14).text('Summary', { underline: true });
-    doc.fontSize(12);
-    doc.text(`Total Inflow: Rs ${totalInflow.toFixed(2)}`);
-    doc.text(`Total Outflow: Rs ${totalOutflow.toFixed(2)}`);
-    doc.text(`Balance: Rs ${balance.toFixed(2)}`);
-    doc.moveDown(2);
-
-    doc.fontSize(14).text('Transactions', { underline: true });
-    doc.moveDown();
-
+    let y = tableTop + 22;
     if (transactions.length === 0) {
-      doc.fontSize(12).text('No transactions found for this period.');
+      doc.fontSize(10).fillColor('#6B7280').text('No transactions found for this period.', leftX, y);
+      doc.fillColor('black');
+      y += 20;
     } else {
-      doc.fontSize(10);
-      doc.text('Date', 50, doc.y, { width: 80 });
-      doc.text('Type', 130, doc.y, { width: 60 });
-      doc.text('Amount', 190, doc.y, { width: 80 });
-      doc.text('Description', 270, doc.y, { width: 250 });
-      doc.moveDown();
-
-      doc.moveTo(50, doc.y).lineTo(520, doc.y).stroke();
-      doc.moveDown(0.5);
-
-      transactions.forEach((t) => {
-        doc.text(new Date(t.date).toLocaleDateString(), 50, doc.y, { width: 80 });
-        doc.text(t.type === 'inflow' ? 'Inflow' : 'Outflow', 130, doc.y, { width: 60 });
-        doc.text(`Rs ${Number(t.amount || 0).toFixed(2)}`, 190, doc.y, { width: 80 });
-        doc.text(t.description || '-', 270, doc.y, { width: 250 });
-        doc.moveDown();
-
-        if (doc.y > 700) {
+      transactions.forEach((t, idx) => {
+        if (y > 700) {
           doc.addPage();
+          drawTableHeader(50);
+          y = 72;
         }
+
+        if (idx % 2 === 0) {
+          doc.save();
+          doc.rect(leftX, y - 2, pageWidth, 18).fill('#FFFFFF');
+          doc.restore();
+        }
+
+        doc.fontSize(10).fillColor('black').text(String(idx + 1), colX[0], y, { width: colWidths[0] });
+        doc.fillColor('#222222').text(new Date(t.date).toLocaleDateString(), colX[1], y, { width: colWidths[1] });
+        doc.fillColor('#222222').text(splitDescription(t.description), colX[2], y, { width: colWidths[2] });
+
+        const typeLabel = t.type === 'inflow' ? 'Inflow' : 'Outflow';
+        doc.fillColor('#222222').text(typeLabel, colX[3], y, { width: colWidths[3] });
+
+        doc.fillColor('black').text(`Rs ${Number(t.amount || 0).toFixed(2)}`, colX[4], y, { width: colWidths[4], align: 'right' });
+        doc.fillColor('black');
+
+        y += 18;
       });
     }
 
-    doc.fontSize(10).text(
+    const summaryTop = y + 10;
+    const summaryX = rightX - 220;
+    doc.save();
+    doc.rect(summaryX, summaryTop - 4, 220, 60).fill('#F2F2F2');
+    doc.restore();
+    doc.moveTo(summaryX, summaryTop).lineTo(rightX, summaryTop).strokeColor('black').stroke();
+    doc.strokeColor('black');
+    doc.fontSize(10).fillColor('black').text(`Total Inflow: Rs ${totalInflow.toFixed(2)}`, summaryX, summaryTop + 8, { width: 220, align: 'right' });
+    doc.fontSize(10).fillColor('black').text(`Total Outflow: Rs ${totalOutflow.toFixed(2)}`, summaryX, summaryTop + 24, { width: 220, align: 'right' });
+    doc.fontSize(11).fillColor('black').text(`Net Balance: Rs ${balance.toFixed(2)}`, summaryX, summaryTop + 44, { width: 220, align: 'right' });
+    doc.fillColor('black');
+
+    doc.fontSize(9).fillColor('#4B4B4B').text(
       `Generated on ${new Date().toLocaleString()}`,
-      50,
+      leftX,
       720,
-      { align: 'center', width: 500 }
+      { width: pageWidth, align: 'center' }
     );
+    doc.fillColor('black');
 
     doc.end();
   } catch (err) {

@@ -1,17 +1,17 @@
 const MODEL_KEY = 'cb_category_model_v1';
 
 export const DEFAULT_CATEGORIES = [
-  '🍔 Food',
-  '🚕 Transport',
-  '🧾 Bills',
-  '🛒 Shopping',
-  '🎬 Entertainment',
-  '🏥 Health',
-  '📚 Education',
-  '🎁 Gifts',
-  '💼 Salary',
-  '💰 Savings',
-  '📦 Other',
+  'Food',
+  'Transport',
+  'Bills',
+  'Shopping',
+  'Entertainment',
+  'Health',
+  'Education',
+  'Gifts',
+  'Salary',
+  'Savings',
+  'Other',
 ];
 
 const STOPWORDS = new Set([
@@ -21,17 +21,19 @@ const STOPWORDS = new Set([
 ]);
 
 const KEYWORD_RULES = [
-  { category: '🍔 Food', keywords: ['food', 'lunch', 'dinner', 'breakfast', 'snack', 'cafe', 'coffee', 'restaurant', 'pizza', 'burger', 'swiggy', 'zomato'] },
-  { category: '🚕 Transport', keywords: ['uber', 'ola', 'taxi', 'bus', 'train', 'metro', 'fuel', 'petrol', 'diesel', 'gas', 'parking', 'toll'] },
-  { category: '🧾 Bills', keywords: ['rent', 'electric', 'electricity', 'water', 'wifi', 'internet', 'bill', 'recharge', 'phone', 'emi'] },
-  { category: '🛒 Shopping', keywords: ['amazon', 'flipkart', 'shopping', 'shop', 'clothes', 'dress', 'shoes', 'grocery', 'groceries', 'store'] },
-  { category: '🎬 Entertainment', keywords: ['movie', 'cinema', 'netflix', 'prime', 'hotstar', 'spotify', 'game', 'concert'] },
-  { category: '🏥 Health', keywords: ['doctor', 'hospital', 'medicine', 'pharmacy', 'clinic', 'gym', 'fitness'] },
-  { category: '📚 Education', keywords: ['course', 'class', 'tuition', 'book', 'udemy', 'coursera', 'college', 'school'] },
-  { category: '🎁 Gifts', keywords: ['gift', 'present'] },
-  { category: '💼 Salary', keywords: ['salary', 'paycheck', 'wage', 'stipend'] },
-  { category: '💰 Savings', keywords: ['saving', 'savings', 'deposit', 'investment', 'sip', 'mutual'] },
+  { category: 'Food', keywords: ['food', 'lunch', 'dinner', 'breakfast', 'snack', 'cafe', 'coffee', 'restaurant', 'pizza', 'burger', 'swiggy', 'zomato'] },
+  { category: 'Transport', keywords: ['uber', 'ola', 'taxi', 'bus', 'train', 'metro', 'fuel', 'petrol', 'diesel', 'gas', 'parking', 'toll'] },
+  { category: 'Bills', keywords: ['rent', 'electric', 'electricity', 'water', 'wifi', 'internet', 'bill', 'recharge', 'phone', 'emi'] },
+  { category: 'Shopping', keywords: ['amazon', 'flipkart', 'shopping', 'shop', 'clothes', 'dress', 'shoes', 'grocery', 'groceries', 'store'] },
+  { category: 'Entertainment', keywords: ['movie', 'cinema', 'netflix', 'prime', 'hotstar', 'spotify', 'game', 'concert'] },
+  { category: 'Health', keywords: ['doctor', 'hospital', 'medicine', 'pharmacy', 'clinic', 'gym', 'fitness'] },
+  { category: 'Education', keywords: ['course', 'class', 'tuition', 'book', 'udemy', 'coursera', 'college', 'school'] },
+  { category: 'Gifts', keywords: ['gift', 'present'] },
+  { category: 'Salary', keywords: ['salary', 'paycheck', 'wage', 'stipend'] },
+  { category: 'Savings', keywords: ['saving', 'savings', 'deposit', 'investment', 'sip', 'mutual'] },
 ];
+
+const EMOJI_REGEX = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu;
 
 function safeJsonParse(value, fallback) {
   try {
@@ -44,7 +46,11 @@ function safeJsonParse(value, fallback) {
 
 function normalizeCategory(category) {
   if (!category) return '';
-  return String(category).replace(/[\]\n\r]/g, '').trim();
+  return String(category)
+    .replace(EMOJI_REGEX, '')
+    .replace(/[\]\n\r]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function tokenize(text) {

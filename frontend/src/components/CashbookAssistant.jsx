@@ -153,7 +153,7 @@ const CashbookAssistant = ({
                   title="Close Assistant"
                   className="text-white text-sm font-semibold px-2 py-1 rounded-lg hover:bg-white hover:bg-opacity-10"
                 >
-                  ✕
+                  X
                 </button>
               </div>
             </div>

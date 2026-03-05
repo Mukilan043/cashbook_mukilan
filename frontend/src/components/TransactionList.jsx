@@ -182,7 +182,7 @@ const TransactionList = ({ cashbookId }) => {
             }}
             className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 text-sm shadow-lg"
           >
-            📄 Export PDF
+            Export PDF
           </button>
         </div>
 
@@ -314,7 +314,7 @@ const TransactionList = ({ cashbookId }) => {
                                 value={editForm.customCategory || ''}
                                 onChange={handleEditChange}
                                 className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                                placeholder="e.g. 🐶 Pet Care"
+                                placeholder="e.g. Pet Care"
                               />
                             )}
 

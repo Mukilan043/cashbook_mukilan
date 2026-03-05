@@ -13,6 +13,8 @@ const Login = () => {
   const [forgotEmail, setForgotEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -121,6 +123,7 @@ const Login = () => {
     setForgotEmail(formData.email || '');
     setNewPassword('');
     setConfirmPassword('');
+    setShowResetPassword(false);
   };
 
   const closeForgot = () => {
@@ -131,6 +134,13 @@ const Login = () => {
     setForgotEmail('');
     setNewPassword('');
     setConfirmPassword('');
+    setShowResetPassword(false);
+  };
+
+  const handleLoginFocus = (e) => {
+    if (e.target.name !== 'password') {
+      setShowPassword(false);
+    }
   };
 
   return (
@@ -182,7 +192,7 @@ const Login = () => {
                       New Password
                     </label>
                     <input
-                      type="password"
+                      type={showResetPassword ? 'text' : 'password'}
                       id="newPassword"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
@@ -198,7 +208,7 @@ const Login = () => {
                       Confirm Password
                     </label>
                     <input
-                      type="password"
+                      type={showResetPassword ? 'text' : 'password'}
                       id="confirmPassword"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -208,6 +218,17 @@ const Login = () => {
                       placeholder="Confirm new password"
                     />
                   </div>
+
+                  <label className="flex items-center gap-2 text-sm text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={showResetPassword}
+                      onChange={(e) => setShowResetPassword(e.target.checked)}
+                      disabled={loading}
+                      className="rounded border-gray-300"
+                    />
+                    Show password
+                  </label>
                 </>
               )}
 
@@ -233,7 +254,7 @@ const Login = () => {
             </form>
           ) : (
             <>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} onFocusCapture={handleLoginFocus} className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                     Email
@@ -263,16 +284,39 @@ const Login = () => {
                       Forgot password?
                     </button>
                   </div>
-                  <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your password"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      id="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      onBlur={() => setShowPassword(false)}
+                      required
+                      className="w-full px-3 py-2 pr-16 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter your password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute inset-y-0 right-0 px-3 text-blue-700 hover:text-blue-800"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? (
+                        <svg className="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
+                          <path d="M15 9l-6 6" />
+                          <path d="M9.5 9.5a3 3 0 014 4" />
+                          <path d="M14.5 14.5a3 3 0 01-4-4" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <button

@@ -1,9 +1,9 @@
 const express = require('express');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, 'backend.env') });
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const path = require('path');
 
 const initDbPath = path.join(__dirname, 'database', 'initDB.js');
 if (!fs.existsSync(initDbPath)) {
@@ -22,6 +22,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:3000",
   "https://cashbook-mukilan.vercel.app",
   "https://cashbook-mukilan.onrender.com"
 ];

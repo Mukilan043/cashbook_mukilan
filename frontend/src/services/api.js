@@ -101,6 +101,22 @@ export const cashbookAPI = {
   },
 };
 
+const buildReportParams = (filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.type) params.append('type', filters.type);
+  if (filters.startDate) params.append('startDate', filters.startDate);
+  if (filters.endDate) params.append('endDate', filters.endDate);
+  return params.toString();
+};
+
+const fetchReportBlob = async (cashbookId, filters = {}) => {
+  const query = buildReportParams(filters);
+  const response = await api.get(`/transactions/cashbook/${cashbookId}/reports/generate?${query}`, {
+    responseType: 'blob',
+  });
+  return response.data;
+};
+
 // Transaction API (requires cashbookId)
 export const transactionAPI = {
   getAll: async (cashbookId, filters = {}) => {
@@ -151,17 +167,12 @@ export const transactionAPI = {
       },
     });
   },
+  generateReportBlob: async (cashbookId, filters = {}) => {
+    const blob = await fetchReportBlob(cashbookId, filters);
+    return blob;
+  },
   generateReport: async (cashbookId, filters = {}) => {
-    const params = new URLSearchParams();
-    if (filters.type) params.append('type', filters.type);
-    if (filters.startDate) params.append('startDate', filters.startDate);
-    if (filters.endDate) params.append('endDate', filters.endDate);
-    
-    const response = await api.get(`/transactions/cashbook/${cashbookId}/reports/generate?${params.toString()}`, {
-      responseType: 'blob',
-    });
-    
-    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const blob = await fetchReportBlob(cashbookId, filters);
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
