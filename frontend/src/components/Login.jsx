@@ -147,7 +147,9 @@ const Login = () => {
     <div className="cb-auth-stage">
       <div className="cb-auth-split">
         <div className="cb-auth-hero">
-          <div className="cb-auth-badge">CB</div>
+          <div className="cb-auth-badge">
+            <img src="/pwa.svg" alt="CashDiary" className="cb-auth-logo" />
+          </div>
           <h1 className="cb-font-display">Welcome to Cash Book</h1>
           <p>Track inflow, outflow, and balances with clean summaries and instant reports.</p>
           <p>Stay on top of your Cash flow with a Simple,focused Dashboard.</p>

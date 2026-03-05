@@ -1,34 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="CashDiary">
   <defs>
-    <linearGradient id="cdg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2563eb"/>
-      <stop offset="0.55" stop-color="#4f46e5"/>
-      <stop offset="1" stop-color="#7c3aed"/>
-    </linearGradient>
-    <linearGradient id="cdg2" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity="0.98"/>
-      <stop offset="1" stop-color="#e2e8f0" stop-opacity="0.9"/>
+    <linearGradient id="frame" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#cbd5f5" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.85"/>
     </linearGradient>
   </defs>
-  <rect x="48" y="48" width="416" height="416" rx="96" fill="url(#cdg)"/>
-  <rect x="86" y="86" width="340" height="340" rx="74" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="4"/>
-
-  <path
-    d="M300 144 A 112 112 0 1 0 300 368"
-    fill="none"
-    stroke="url(#cdg2)"
-    stroke-width="34"
-    stroke-linecap="round"
-  />
-  <path
-    d="M304 144 L304 368 M304 144 A 102 102 0 0 1 304 368"
-    fill="none"
-    stroke="url(#cdg2)"
-    stroke-width="34"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-  <circle cx="186" cy="254" r="88" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="24"/>
-  <path d="M236 254h-100" stroke="rgba(255,255,255,0.95)" stroke-width="24" stroke-linecap="round"/>
-  <circle cx="186" cy="254" r="46" fill="none" stroke="rgba(37,99,235,0.5)" stroke-width="12"/>
+  <rect x="48" y="48" width="416" height="416" rx="96" fill="#0b0d10"/>
+  <rect x="86" y="86" width="340" height="340" rx="74" fill="none" stroke="url(#frame)" stroke-width="6"/>
+  <text
+    x="256"
+    y="314"
+    text-anchor="middle"
+    font-size="176"
+    font-weight="800"
+    font-family="Segoe UI, Arial, sans-serif"
+    letter-spacing="10"
+    fill="#ffffff"
+  >CD</text>
 </svg>
