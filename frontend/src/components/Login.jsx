@@ -144,35 +144,127 @@ const Login = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-10"
-      style={{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1920&q=80)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
-    >
-      <div className="bg-black bg-opacity-60 absolute inset-0"></div>
-      <div className="relative z-10 w-full max-w-lg">
-        <div className="bg-white bg-opacity-95 rounded-2xl shadow-2xl p-10">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-            {showForgot ? 'Forgot Password' : 'Login'}
-          </h2>
+    <div className="cb-auth-stage">
+      <div className="cb-auth-split">
+        <div className="cb-auth-hero">
+          <div className="cb-auth-badge">CB</div>
+          <h1 className="cb-font-display">Welcome to Cash Book</h1>
+          <p>Track inflow, outflow, and balances with clean summaries and instant reports.</p>
+          <p>Stay on top of your Cash flow with a Simple,focused Dashboard.</p>
+          <div className="cb-auth-links" style={{ color: '#f8fafc' }}>
+            
+          </div>
+          <div className="cb-auth-mini-grid">
+            <div className="cb-auth-mini-card cb-anim-fade-in-up">
+              <div className="cb-auth-mini-icon cb-auth-mini-icon--green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 4v16" />
+                  <path d="M6 14l6 6 6-6" />
+                </svg>
+              </div>
+              <div>
+                <h4>Cash Inflow</h4>
+                <p>Record income in seconds.</p>
+              </div>
+            </div>
+            <div className="cb-auth-mini-card cb-anim-fade-in-up">
+              <div className="cb-auth-mini-icon cb-auth-mini-icon--rose">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 20V4" />
+                  <path d="M6 10l6-6 6 6" />
+                </svg>
+              </div>
+              <div>
+                <h4>Cash Outflow</h4>
+                <p>Track expenses and vendors.</p>
+              </div>
+            </div>
+            <div className="cb-auth-mini-card cb-anim-fade-in-up">
+              <div className="cb-auth-mini-icon cb-auth-mini-icon--blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4h16v16H4z" />
+                  <path d="M8 12h8" />
+                  <path d="M8 16h5" />
+                </svg>
+              </div>
+              <div>
+                <h4>Reports & History</h4>
+                <p>Export PDF summaries.</p>
+              </div>
+            </div>
+            <div className="cb-auth-mini-card cb-anim-fade-in-up">
+              <div className="cb-auth-mini-icon cb-auth-mini-icon--teal">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 7h16" />
+                  <path d="M4 12h16" />
+                  <path d="M4 17h16" />
+                </svg>
+              </div>
+              <div>
+                <h4>View & Manage</h4>
+                <p>Edit or delete entries.</p>
+              </div>
+            </div>
+            <div className="cb-auth-mini-card cb-anim-fade-in-up">
+              <div className="cb-auth-mini-icon cb-auth-mini-icon--amber">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 4h12v16H6z" />
+                  <path d="M9 8h6" />
+                  <path d="M9 12h6" />
+                </svg>
+              </div>
+              <div>
+                <h4>Full History</h4>
+                <p>See every transaction.</p>
+              </div>
+            </div>
+            <div className="cb-auth-mini-card cb-anim-fade-in-up">
+              <div className="cb-auth-mini-icon cb-auth-mini-icon--violet">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 6h16" />
+                  <path d="M7 10h10" />
+                  <path d="M10 14h4" />
+                  <path d="M6 18h12" />
+                </svg>
+              </div>
+              <div>
+                <h4>Multiple Cashbooks</h4>
+                <p>Organize by projects.</p>
+              </div>
+            </div>
+          </div>
+          <div className="cb-auth-footer" style={{ color: '#f8fafc' }}>
+            Join thousands tracking cash daily with clarity.
+          </div>
+          <div className="cb-auth-streaks" />
+        </div>
+
+        <div className="cb-auth-form">
+          <h2>{showForgot ? 'Reset Access' : 'User Login'}</h2>
+          <h3 className="cb-font-display">{showForgot ? 'Update your password' : 'Sign in to Cash Book'}</h3>
+          <p>{showForgot ? 'Verify your email and set a new password.' : 'Use your email and password to continue.'}</p>
 
           {info && (
-            <div className="mb-4 p-3 bg-green-100 text-green-800 rounded-md text-sm">{info}</div>
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+              {info}
+            </div>
           )}
           {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">{error}</div>
+            <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              {error}
+            </div>
           )}
 
           {showForgot ? (
             <form onSubmit={forgotStep === 1 ? handleForgotVerify : handleForgotReset} className="space-y-4">
-              <div>
-                <label htmlFor="forgotEmail" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
+              <label className="cb-auth-field">
+                <span className="cb-auth-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M4 4h16v16H4z" stroke="none" />
+                    <path d="M4 4h16v16H4z" />
+                    <path d="M4 4l8 8 8-8" />
+                  </svg>
+                </span>
                 <input
                   type="email"
                   id="forgotEmail"
@@ -180,17 +272,19 @@ const Login = () => {
                   onChange={(e) => setForgotEmail(e.target.value)}
                   required
                   disabled={loading || forgotStep === 2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                  placeholder="Enter your registered email"
+                  placeholder="Email address"
                 />
-              </div>
+              </label>
 
               {forgotStep === 2 && (
                 <>
-                  <div>
-                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                      New Password
-                    </label>
+                  <label className="cb-auth-field">
+                    <span className="cb-auth-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="4" y="10" width="16" height="10" rx="2" />
+                        <path d="M8 10V7a4 4 0 018 0v3" />
+                      </svg>
+                    </span>
                     <input
                       type={showResetPassword ? 'text' : 'password'}
                       id="newPassword"
@@ -198,15 +292,17 @@ const Login = () => {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       disabled={loading}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                      placeholder="Enter new password"
+                      placeholder="New password"
                     />
-                  </div>
+                  </label>
 
-                  <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                      Confirm Password
-                    </label>
+                  <label className="cb-auth-field">
+                    <span className="cb-auth-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="4" y="10" width="16" height="10" rx="2" />
+                        <path d="M8 10V7a4 4 0 018 0v3" />
+                      </svg>
+                    </span>
                     <input
                       type={showResetPassword ? 'text' : 'password'}
                       id="confirmPassword"
@@ -214,132 +310,114 @@ const Login = () => {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       disabled={loading}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                      placeholder="Confirm new password"
+                      placeholder="Confirm password"
                     />
-                  </div>
+                  </label>
 
-                  <label className="flex items-center gap-2 text-sm text-gray-600">
-                    <input
-                      type="checkbox"
-                      checked={showResetPassword}
-                      onChange={(e) => setShowResetPassword(e.target.checked)}
-                      disabled={loading}
-                      className="rounded border-gray-300"
-                    />
-                    Show password
+                  <label className="cb-auth-links">
+                    <span>
+                      <input
+                        type="checkbox"
+                        checked={showResetPassword}
+                        onChange={(e) => setShowResetPassword(e.target.checked)}
+                        disabled={loading}
+                        className="rounded border-slate-300"
+                      />
+                      <span className="ml-2">Show password</span>
+                    </span>
                   </label>
                 </>
               )}
 
-              <div className="flex gap-3">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                >
-                  {loading
-                    ? (forgotStep === 1 ? 'Verifying…' : 'Updating…')
-                    : (forgotStep === 1 ? 'Verify Email' : 'Update Password')}
-                </button>
-                <button
-                  type="button"
-                  onClick={closeForgot}
-                  disabled={loading}
-                  className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-              </div>
+              <button type="submit" disabled={loading} className="cb-auth-action">
+                {loading
+                  ? (forgotStep === 1 ? 'Verifying…' : 'Updating…')
+                  : (forgotStep === 1 ? 'Verify Email' : 'Update Password')}
+              </button>
+              <button type="button" onClick={closeForgot} disabled={loading} className="cb-auth-footer">
+                Cancel
+              </button>
             </form>
           ) : (
-            <>
-              <form onSubmit={handleSubmit} onFocusCapture={handleLoginFocus} className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your email"
-                  />
-                </div>
+            <form onSubmit={handleSubmit} onFocusCapture={handleLoginFocus} className="space-y-4">
+              <label className="cb-auth-field">
+                <span className="cb-auth-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
+                    <path d="M20 20c-1.5-2.5-4.1-4-8-4s-6.5 1.5-8 4" />
+                  </svg>
+                </span>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="Email address"
+                />
+              </label>
 
-                <div>
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                      Password
-                    </label>
-                    <button
-                      type="button"
-                      onClick={openForgot}
-                      className="text-xs font-semibold text-indigo-700 hover:text-indigo-800"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      id="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      onBlur={() => setShowPassword(false)}
-                      required
-                      className="w-full px-3 py-2 pr-16 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter your password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute inset-y-0 right-0 px-3 text-blue-700 hover:text-blue-800"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showPassword ? (
-                        <svg className="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
-                          <path d="M15 9l-6 6" />
-                          <path d="M9.5 9.5a3 3 0 014 4" />
-                          <path d="M14.5 14.5a3 3 0 01-4-4" />
-                        </svg>
-                      ) : (
-                        <svg className="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
+              <label className="cb-auth-field">
+                <span className="cb-auth-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="4" y="10" width="16" height="10" rx="2" />
+                    <path d="M8 10V7a4 4 0 018 0v3" />
+                  </svg>
+                </span>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  onBlur={() => setShowPassword(false)}
+                  required
+                  placeholder="Password"
+                />
                 <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="cb-auth-icon"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {loading ? 'Logging in...' : 'Login'}
+                  {showPassword ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
+                      <path d="M15 9l-6 6" />
+                      <path d="M9.5 9.5a3 3 0 014 4" />
+                      <path d="M14.5 14.5a3 3 0 01-4-4" />
+                    </svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
                 </button>
-              </form>
-            </>
+              </label>
+
+              <div className="cb-auth-links">
+                <span>
+                  <input type="checkbox" className="rounded border-slate-300" />
+                  <span className="ml-2">Remember me</span>
+                </span>
+                <button type="button" onClick={openForgot}>Forgot password?</button>
+              </div>
+
+              <button type="submit" disabled={loading} className="cb-auth-action">
+                {loading ? 'Signing in...' : 'Login'}
+              </button>
+            </form>
           )}
 
-          <p className="mt-4 text-center text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-blue-600 hover:underline">
-              Sign up
-            </Link>
-          </p>
-
-          <Link to="/" className="block mt-4 text-center text-sm text-gray-500 hover:text-gray-700">
-            ← Back to home
-          </Link>
+          <div className="cb-auth-footer">
+            New here?{' '}
+            <Link to="/signup">Create an account</Link>
+          </div>
+          <div className="cb-auth-footer">
+            <Link to="/">← Back to home</Link>
+          </div>
         </div>
       </div>
     </div>

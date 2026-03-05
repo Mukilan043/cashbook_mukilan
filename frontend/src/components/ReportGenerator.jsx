@@ -576,6 +576,12 @@ const ReportGenerator = ({ cashbookId }) => {
                 {analyticsLoading ? 'Loading…' : `Loaded ${transactions.length} transactions`}
               </div>
             </div>
+            <p className="mt-1 text-sm text-gray-600">
+              Inflow = money in. Outflow = money out. Net = Inflow − Outflow.
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              Positive Net means you saved. Negative Net means you spent more than you earned.
+            </p>
 
             {analyticsError && (
               <div className="mt-3 p-3 rounded-md bg-red-100 text-red-700 text-sm">
@@ -593,7 +599,7 @@ const ReportGenerator = ({ cashbookId }) => {
                 <div className="text-lg font-bold text-red-700">{formatMoney(analytics.totalOutflow)}</div>
               </div>
               <div className="bg-white bg-opacity-95 rounded-lg border border-gray-200 p-4">
-                <div className="text-xs text-gray-500">Net</div>
+                <div className="text-xs text-gray-500">Net (Inflow − Outflow)</div>
                 <div className={`text-lg font-bold ${analytics.net >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
                   {formatMoney(analytics.net)}
                 </div>

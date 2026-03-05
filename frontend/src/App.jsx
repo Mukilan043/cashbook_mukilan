@@ -577,8 +577,8 @@ const HomePage = () => {
 
           <div className="mb-6 sm:mb-8 relative cb-anim-fade-in-up">
             <div className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-2xl shadow-2xl backdrop-blur p-5 sm:p-7 cb-anim-shimmer">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="min-w-0">
                   <h1 className="text-3xl sm:text-5xl font-extrabold text-white drop-shadow">
                     Cash Book Application
                   </h1>
@@ -586,17 +586,17 @@ const HomePage = () => {
                     Pick a cashbook to open, or create a new one.
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="px-4 py-2 rounded-xl bg-white bg-opacity-10 border border-white border-opacity-20 text-white text-sm">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                  <div className="w-full sm:w-auto text-center px-3 sm:px-4 py-2 rounded-xl bg-white bg-opacity-10 border border-white border-opacity-20 text-white text-xs sm:text-sm">
                     <span className="font-semibold">{cashbooks.length}</span> cashbook{cashbooks.length === 1 ? '' : 's'}
                   </div>
                   <button
                     onClick={() => setIsCreateOpen(true)}
-                    className="px-4 py-2 rounded-xl text-white text-sm font-semibold shadow-xl border border-white border-opacity-20 backdrop-blur bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    className="w-full sm:w-auto justify-center px-3 sm:px-4 py-2 rounded-xl text-white text-xs sm:text-sm font-semibold shadow-xl border border-white border-opacity-20 backdrop-blur bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                     aria-label="Create new cashbook"
                     title="New Cashbook"
                   >
-                    <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center gap-2">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>

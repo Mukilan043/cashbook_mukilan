@@ -19,6 +19,7 @@ const UserProfile = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [uploading, setUploading] = useState(false);
   const [openCashbookMenuId, setOpenCashbookMenuId] = useState(null);
+  const [profilePreview, setProfilePreview] = useState('');
   const menuRef = useRef(null);
 
   const closeCashbookMenu = () => setOpenCashbookMenuId(null);
@@ -31,6 +32,7 @@ const UserProfile = () => {
         username: user.username || '',
         mobile: user.mobile || '',
       });
+      setProfilePreview(user.profile_image || '');
     }
   }, [user]);
 
@@ -96,6 +98,7 @@ const UserProfile = () => {
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
+      setProfilePreview(String(base64));
       const res = await authAPI.updateProfile({ profile_image: base64 });
       await fetchUser();
       setMessage({ type: 'success', text: 'Profile image updated!' });
@@ -214,9 +217,9 @@ const UserProfile = () => {
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden border-4 border-white shadow">
-                  {user?.profile_image ? (
+                  {profilePreview ? (
                     <img
-                      src={user.profile_image}
+                      src={profilePreview}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
