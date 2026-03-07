@@ -815,8 +815,7 @@ const ThemeInitializer = () => {
     if (typeof window === 'undefined') return;
     const root = document.documentElement;
     const stored = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = stored === 'dark' || stored === 'light' ? stored : (prefersDark ? 'dark' : 'light');
+    const theme = stored === 'dark' || stored === 'light' ? stored : 'light';
     root.setAttribute('data-theme', theme);
   }, []);
 
