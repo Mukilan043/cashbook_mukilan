@@ -39,9 +39,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password) => {
+  const login = async (identifier, password) => {
     try {
-      const response = await authAPI.login(email, password);
+      const response = await authAPI.login(identifier, password);
       localStorage.setItem('token', response.token);
       setUser(response.user);
       setIsGuest(false);

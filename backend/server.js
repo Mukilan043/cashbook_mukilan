@@ -16,6 +16,7 @@ const authRoutes = require('./routes/auth');
 const cashbookRoutes = require('./routes/cashbooks');
 const assistantRoutes = require('./routes/assistant');
 const debugRoutes = require('./routes/debug');
+const receiptRoutes = require('./routes/receipt');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -55,6 +56,7 @@ app.use('/api/cashbooks', cashbookRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/assistant', assistantRoutes);
 app.use('/api/debug', debugRoutes);
+app.use('/api/scan-receipt', receiptRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

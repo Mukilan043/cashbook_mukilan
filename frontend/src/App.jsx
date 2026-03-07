@@ -213,7 +213,7 @@ const CashbookView = () => {
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-3xl sm:text-4xl font-bold text-center mb-4 text-white drop-shadow-lg">
-              Cash Book Application
+              CashDairy
             </h1>
             
             {/* Cashbook Selector */}
@@ -559,40 +559,37 @@ const HomePage = () => {
 
   return (
     <div 
-      className="min-h-screen bg-gray-100 pb-20"
+      className="cb-home-shell min-h-screen bg-gray-100 pb-28 sm:pb-20 overflow-x-hidden"
       style={{
         backgroundImage: 'url(https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1920&q=80)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
       }}
     >
       <div className="bg-black bg-opacity-60 min-h-screen">
-        <div className="max-w-6xl mx-auto px-3 sm:px-6 py-8 sm:py-10 relative">
+        <div className="max-w-6xl mx-auto px-2 sm:px-6 py-6 sm:py-10 relative">
           {/* ambient glow */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute -top-20 -left-20 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-blue-500 opacity-20 blur-3xl cb-anim-float" />
             <div className="absolute top-32 -right-24 w-72 h-72 sm:w-[28rem] sm:h-[28rem] rounded-full bg-indigo-500 opacity-20 blur-3xl cb-anim-float-slow" />
           </div>
 
-          <div className="mb-6 sm:mb-8 relative cb-anim-fade-in-up">
-            <div className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-2xl shadow-2xl backdrop-blur p-5 sm:p-7 cb-anim-shimmer">
+          <div className="mb-5 sm:mb-8 relative cb-anim-fade-in-up">
+            <div className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-2xl shadow-2xl backdrop-blur p-4 sm:p-7 cb-anim-shimmer">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="min-w-0">
                   <h1 className="text-3xl sm:text-5xl font-extrabold text-white drop-shadow">
-                    Cash Book Application
+                    CashDiary
                   </h1>
                   <p className="text-white text-opacity-90 mt-2 sm:mt-3 text-sm sm:text-base">
                     Pick a cashbook to open, or create a new one.
                   </p>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                   <div className="w-full sm:w-auto text-center px-3 sm:px-4 py-2 rounded-xl bg-white bg-opacity-10 border border-white border-opacity-20 text-white text-xs sm:text-sm">
                     <span className="font-semibold">{cashbooks.length}</span> cashbook{cashbooks.length === 1 ? '' : 's'}
                   </div>
                   <button
                     onClick={() => setIsCreateOpen(true)}
-                    className="w-full sm:w-auto justify-center px-3 sm:px-4 py-2 rounded-xl text-white text-xs sm:text-sm font-semibold shadow-xl border border-white border-opacity-20 backdrop-blur bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    className="w-full sm:w-auto justify-center px-3 sm:px-4 py-2.5 rounded-xl text-white text-xs sm:text-sm font-semibold shadow-xl border border-white border-opacity-20 backdrop-blur bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                     aria-label="Create new cashbook"
                     title="New Cashbook"
                   >
@@ -609,12 +606,12 @@ const HomePage = () => {
           </div>
 
           {loading ? (
-            <div className="mt-6 sm:mt-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="mt-5 sm:mt-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur"
+                    className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur"
                   >
                     <div className="h-4 w-2/3 bg-white bg-opacity-20 rounded mb-4" />
                     <div className="h-3 w-full bg-white bg-opacity-10 rounded mb-2" />
@@ -628,7 +625,7 @@ const HomePage = () => {
               </div>
             </div>
           ) : cashbooks.length === 0 ? (
-            <div className="mt-6 sm:mt-8">
+            <div className="mt-5 sm:mt-8">
               <div className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-2xl shadow-2xl backdrop-blur p-8 sm:p-10 text-center">
                 <div className="text-3xl sm:text-4xl mb-3 font-bold text-white">CB</div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-white drop-shadow mb-2">No cashbooks yet</h2>
@@ -636,7 +633,7 @@ const HomePage = () => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {cashbooks.map((cashbook) => {
                 const createdLabel = cashbook.created_at
                   ? new Date(cashbook.created_at).toLocaleDateString()
@@ -666,7 +663,7 @@ const HomePage = () => {
                         <div className="absolute -inset-y-8 -left-1/2 w-1/2 rotate-12 bg-gradient-to-r from-transparent via-white/35 to-transparent cb-anim-shimmer" />
                       </div>
 
-                      <div className="p-5 sm:p-6 relative">
+                      <div className="p-4 sm:p-6 relative">
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                           <div className="absolute -top-16 -right-16 w-52 h-52 rounded-full bg-blue-500 opacity-10 blur-2xl" />
                           <div className="absolute -bottom-20 -left-20 w-52 h-52 rounded-full bg-indigo-500 opacity-10 blur-2xl" />
@@ -728,7 +725,7 @@ const HomePage = () => {
                           </div>
                         </div>
 
-                        <div className="mt-6 flex items-center justify-between gap-3">
+                        <div className="mt-5 flex items-center justify-between gap-3">
                           <div className="text-xs sm:text-sm text-gray-500 truncate">
                             {createdLabel ? `Created: ${createdLabel}` : ' '}
                           </div>
@@ -747,7 +744,7 @@ const HomePage = () => {
           {/* Floating + Add Cashbook (above bottom nav) */}
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="group fixed right-4 bottom-24 bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-50 ring-4 ring-blue-200 ring-opacity-30"
+            className="group fixed right-3 sm:right-4 bottom-28 sm:bottom-24 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-2xl flex items-center justify-center z-50 ring-4 ring-blue-200 ring-opacity-30"
             aria-label="Add new cashbook"
             title="New Cashbook"
           >
@@ -813,9 +810,23 @@ const HomePage = () => {
   );
 };
 
+const ThemeInitializer = () => {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const root = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = stored === 'dark' || stored === 'light' ? stored : (prefersDark ? 'dark' : 'light');
+    root.setAttribute('data-theme', theme);
+  }, []);
+
+  return null;
+};
+
 function App() {
   return (
     <AuthProvider>
+      <ThemeInitializer />
       <Router>
         <MainApp />
       </Router>

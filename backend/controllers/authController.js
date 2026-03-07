@@ -47,23 +47,27 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
   const db = getDb();
-  const { email, password } = req.body || {};
+  const { identifier, email, password } = req.body || {};
+  const rawIdentifier = String(identifier || email || '').trim();
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
+  if (!rawIdentifier || !password) {
+    return res.status(400).json({ error: 'Username, email, or phone and password are required' });
   }
 
   try {
-    const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+    const result = await db.query(
+      'SELECT * FROM users WHERE LOWER(email) = LOWER($1) OR LOWER(username) = LOWER($1) OR mobile = $1',
+      [rawIdentifier]
+    );
     const user = result.rows[0];
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const token = generateToken({ id: user.id, username: user.username, email: user.email });

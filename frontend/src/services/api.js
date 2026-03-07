@@ -39,8 +39,8 @@ export const authAPI = {
     const response = await api.post('/auth/signup', userData);
     return response.data;
   },
-  login: async (email, password) => {
-    const response = await api.post('/auth/login', { email, password });
+  login: async (identifier, password) => {
+    const response = await api.post('/auth/login', { identifier, password });
     return response.data;
   },
   forgotPasswordVerify: async (email) => {
@@ -190,6 +190,17 @@ export const transactionAPI = {
 export const assistantAPI = {
   chat: async (payload) => {
     const response = await api.post('/assistant/chat', payload);
+    return response.data;
+  },
+};
+
+export const receiptAPI = {
+  scanReceipt: async (file) => {
+    const formData = new FormData();
+    formData.append('receipt', file);
+    const response = await api.post('/scan-receipt', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 };

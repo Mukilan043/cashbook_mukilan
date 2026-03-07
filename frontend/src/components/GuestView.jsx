@@ -16,7 +16,7 @@ const GuestView = () => {
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 text-white drop-shadow-lg">
-              Cash Book Application
+              CashDiary
             </h1>
             
             <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 mb-4 shadow-lg">

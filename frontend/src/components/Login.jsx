@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../services/api';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ identifier: '', password: '' });
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ const Login = () => {
     setInfo('');
     setLoading(true);
 
-    const result = await login(formData.email, formData.password);
+    const result = await login(formData.identifier, formData.password);
 
     if (result.success) {
       navigate('/');
@@ -120,7 +120,8 @@ const Login = () => {
     setForgotStep(1);
     setError('');
     setInfo('');
-    setForgotEmail(formData.email || '');
+    const looksLikeEmail = formData.identifier.includes('@');
+    setForgotEmail(looksLikeEmail ? formData.identifier : '');
     setNewPassword('');
     setConfirmPassword('');
     setShowResetPassword(false);
@@ -148,7 +149,7 @@ const Login = () => {
       <div className="cb-auth-split">
         <div className="cb-auth-hero">
           <div className="cb-auth-badge">
-            <img src="/pwa.svg" alt="CashDiary" className="cb-auth-logo" />
+            <img src="/cdlogo.png" alt="CashDiary" className="cb-auth-logo" />
           </div>
           <h1 className="cb-font-display">Welcome to Cash Book</h1>
           <p>Track inflow, outflow, and balances with clean summaries and instant reports.</p>
@@ -244,7 +245,7 @@ const Login = () => {
         <div className="cb-auth-form">
           <h2>{showForgot ? 'Reset Access' : 'User Login'}</h2>
           <h3 className="cb-font-display">{showForgot ? 'Update your password' : 'Sign in to Cash Book'}</h3>
-          <p>{showForgot ? 'Verify your email and set a new password.' : 'Use your email and password to continue.'}</p>
+          <p>{showForgot ? 'Verify your email and set a new password.' : 'Use your email, phone, or username and password to continue.'}</p>
 
           {info && (
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
@@ -350,13 +351,13 @@ const Login = () => {
                   </svg>
                 </span>
                 <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  id="identifier"
+                  name="identifier"
+                  value={formData.identifier}
                   onChange={handleChange}
                   required
-                  placeholder="Email address"
+                  placeholder="Email / Phone / Username"
                 />
               </label>
 

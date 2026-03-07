@@ -21,6 +21,14 @@ const UserProfile = () => {
   const [openCashbookMenuId, setOpenCashbookMenuId] = useState(null);
   const [profilePreview, setProfilePreview] = useState('');
   const menuRef = useRef(null);
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'light';
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || stored === 'light') return stored;
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? 'dark' : 'light';
+  });
+  const isDark = theme === 'dark';
 
   const closeCashbookMenu = () => setOpenCashbookMenuId(null);
   const toggleCashbookMenu = (id) => setOpenCashbookMenuId((prev) => (prev === id ? null : id));
@@ -35,6 +43,11 @@ const UserProfile = () => {
       setProfilePreview(user.profile_image || '');
     }
   }, [user]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const onDocClick = (e) => {
@@ -137,6 +150,19 @@ const UserProfile = () => {
     navigate('/');
   };
 
+  const handleThemeToggle = () => {
+    const next = isDark ? 'light' : 'dark';
+    setTheme(next);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme', next);
+    }
+    if (typeof document !== 'undefined') {
+      const root = document.documentElement;
+      root.classList.add('theme-transition');
+      window.setTimeout(() => root.classList.remove('theme-transition'), 300);
+    }
+  };
+
   const handleEditCashbookName = async (cashbook) => {
     const nextName = window.prompt('Edit cashbook name:', cashbook?.name || '');
     if (nextName == null) return closeCashbookMenu();
@@ -198,7 +224,7 @@ const UserProfile = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return <div className="text-center py-8">Wait few seconds to see your profile....</div>;
   }
 
   return (
@@ -249,16 +275,32 @@ const UserProfile = () => {
                 </label>
               </div>
             </div>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
               <h2 className="text-2xl font-bold">User Profile</h2>
-              {!editing && (
-                <button
-                  onClick={handleEdit}
-                  className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-                >
-                  Edit
-                </button>
-              )}
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-gray-700">
+                    {isDark ? 'Dark mode' : 'Light mode'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleThemeToggle}
+                    aria-label="Toggle dark mode"
+                    aria-pressed={isDark}
+                    className={`cb-theme-toggle ${isDark ? 'cb-theme-toggle--dark' : ''}`}
+                  >
+                    <span className="cb-theme-toggle__thumb" />
+                  </button>
+                </div>
+                {!editing && (
+                  <button
+                    onClick={handleEdit}
+                    className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* User Credentials */}

@@ -69,7 +69,7 @@ const Signup = () => {
       <div className="cb-auth-split">
         <div className="cb-auth-hero">
           <div className="cb-auth-badge">
-            <img src="/pwa.svg" alt="CashDiary" className="cb-auth-logo" />
+            <img src="/cdlogo.png" alt="CashDiary" className="cb-auth-logo" />
           </div>
           <h1 className="cb-font-display">Create your Cash Book</h1>
           <p>Start tracking your income and expenses in one clean, focused space.</p>

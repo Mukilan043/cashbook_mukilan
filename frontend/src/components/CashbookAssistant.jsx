@@ -41,7 +41,7 @@ const CashbookAssistant = ({
     {
       id: 'welcome',
       role: 'assistant',
-      text: 'Ask me anything about your cashbooks. Example: “How much did I spend last 7 days?” or “Show top category this month.”',
+      text: 'Ask me anything about your cashbooks?”',
       ts: Date.now(),
     },
   ]);
