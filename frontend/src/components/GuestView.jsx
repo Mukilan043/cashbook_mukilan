@@ -1,93 +1,180 @@
 import { Link } from 'react-router-dom';
 
+const features = [
+  {
+    icon: '↓',
+    color: 'var(--cd-success)',
+    bg: 'var(--cd-success-bg)',
+    border: 'rgba(0,200,150,0.2)',
+    title: 'Cash Inflow',
+    desc: 'Record income in seconds',
+  },
+  {
+    icon: '↑',
+    color: 'var(--cd-danger)',
+    bg: 'var(--cd-danger-bg)',
+    border: 'rgba(255,92,92,0.2)',
+    title: 'Cash Outflow',
+    desc: 'Track every expense easily',
+  },
+  {
+    icon: '📊',
+    color: '#A78BFA',
+    bg: 'rgba(108,99,255,0.1)',
+    border: 'rgba(108,99,255,0.2)',
+    title: 'View & Manage',
+    desc: 'Edit or delete transactions',
+  },
+  {
+    icon: '🕐',
+    color: '#FFB84D',
+    bg: 'rgba(255,184,77,0.1)',
+    border: 'rgba(255,184,77,0.2)',
+    title: 'Full History',
+    desc: 'See every transaction record',
+  },
+  {
+    icon: '📄',
+    color: '#60A5FA',
+    bg: 'rgba(96,165,250,0.1)',
+    border: 'rgba(96,165,250,0.2)',
+    title: 'PDF Reports',
+    desc: 'Export clean PDF summaries',
+  },
+  {
+    icon: '📚',
+    color: '#34D399',
+    bg: 'rgba(52,211,153,0.1)',
+    border: 'rgba(52,211,153,0.2)',
+    title: 'Multiple Cashbooks',
+    desc: 'Organize by project or category',
+  },
+];
+
 const GuestView = () => {
   return (
-    <div 
-      className="min-h-screen bg-gray-100 pb-20"
+    <div
       style={{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1920&q=80)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        minHeight: '100vh',
+        background: 'var(--cd-bg)',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <div className="bg-black bg-opacity-40 min-h-screen">
-        <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 text-white drop-shadow-lg">
-              CashDiary
-            </h1>
-            
-            <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 mb-4 shadow-lg">
-              <p className="text-sm text-yellow-900 text-center font-semibold">
-                You are viewing as a guest. You can explore all features but cannot perform any actions.
-              </p>
-              <p className="text-sm text-yellow-800 text-center mt-2">
-                <Link to="/login" className="underline font-semibold text-blue-600 hover:text-blue-800">Login</Link> or{' '}
-                <Link to="/signup" className="underline font-semibold text-green-600 hover:text-green-800">Sign Up</Link> to start managing your cash flow!
-              </p>
-            </div>
-          </div>
+      {/* Ambient glows */}
+      <div style={{
+        position: 'absolute', top: -200, left: -200, width: 500, height: 500,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: -150, right: -150, width: 400, height: 400,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(0,200,150,0.1) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
 
-          {/* Features Overview */}
-          <div className="text-center py-12">
-            <h2 className="text-3xl font-bold text-white mb-4 drop-shadow-lg">Welcome to Cash Book</h2>
-            <p className="text-white text-lg mb-8 drop-shadow-md">Explore the features below. Login to start managing your cash flow!</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              <div className="bg-white bg-opacity-95 p-6 rounded-lg shadow-xl border-2 border-green-300">
-                <div className="text-4xl mb-3">💰</div>
-                <h3 className="font-semibold text-green-800 mb-2 text-lg">Cash Inflow</h3>
-                <p className="text-sm text-green-700">Record money coming into your account</p>
-              </div>
-              
-              <div className="bg-white bg-opacity-95 p-6 rounded-lg shadow-xl border-2 border-red-300">
-                <div className="text-4xl mb-3">💸</div>
-                <h3 className="font-semibold text-red-800 mb-2 text-lg">Cash Outflow</h3>
-                <p className="text-sm text-red-700">Track money going out of your account</p>
-              </div>
-              
-              <div className="bg-white bg-opacity-95 p-6 rounded-lg shadow-xl border-2 border-blue-300">
-                <div className="text-4xl mb-3">📊</div>
-                <h3 className="font-semibold text-blue-800 mb-2 text-lg">View & Manage</h3>
-                <p className="text-sm text-blue-700">Edit or delete your transactions</p>
-              </div>
-              
-              <div className="bg-white bg-opacity-95 p-6 rounded-lg shadow-xl border-2 border-purple-300">
-                <div className="text-4xl mb-3">📜</div>
-                <h3 className="font-semibold text-purple-800 mb-2 text-lg">View History</h3>
-                <p className="text-sm text-purple-700">See chronological transaction records</p>
-              </div>
-              
-              <div className="bg-white bg-opacity-95 p-6 rounded-lg shadow-xl border-2 border-indigo-300">
-                <div className="text-4xl mb-3">📄</div>
-                <h3 className="font-semibold text-indigo-800 mb-2 text-lg">Generate Report</h3>
-                <p className="text-sm text-indigo-700">Export PDF reports with summaries</p>
-              </div>
-              
-              <div className="bg-white bg-opacity-95 p-6 rounded-lg shadow-xl border-2 border-yellow-300">
-                <div className="text-4xl mb-3">📚</div>
-                <h3 className="font-semibold text-yellow-800 mb-2 text-lg">Multiple Cashbooks</h3>
-                <p className="text-sm text-yellow-700">Organize transactions by category or project</p>
-              </div>
-            </div>
-
-            <div className="mt-12">
-              <Link
-                to="/login"
-                className="inline-block bg-blue-600 text-white py-3 px-8 rounded-lg font-semibold text-lg hover:bg-blue-700 shadow-lg mr-4"
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="inline-block bg-green-600 text-white py-3 px-8 rounded-lg font-semibold text-lg hover:bg-green-700 shadow-lg"
-              >
-                Sign Up
-              </Link>
-            </div>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '40px 20px 60px', position: 'relative', zIndex: 2 }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }} className="cd-anim-fade-up">
+          {/* Logo icon */}
+          <div style={{
+            width: 72, height: 72, borderRadius: 22,
+            background: 'var(--cd-primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 16px',
+            overflow: 'hidden'
+          }}>
+            <img src="/cdlogo.png" alt="CashDiary Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: 6 }}>
+            <div className="cd-logo-text" style={{ fontSize: '2.2rem', marginBottom: 0 }}>CashDiary</div>
+          </div>
+          <div style={{ fontSize: '1rem', color: 'var(--cd-text-soft)', maxWidth: 320, margin: '0 auto', lineHeight: 1.6 }}>
+            Smart cash tracking for individuals & businesses
+          </div>
+        </div>
+
+        {/* Guest banner */}
+        <div style={{
+          background: 'rgba(255,184,77,0.1)',
+          border: '1px solid rgba(255,184,77,0.3)',
+          borderRadius: 14,
+          padding: '14px 18px',
+          marginBottom: 28,
+          textAlign: 'center',
+        }} className="cd-anim-fade-up">
+          <div style={{ fontSize: '0.85rem', color: 'var(--cd-warning)', fontWeight: 500, lineHeight: 1.6 }}>
+            👁 You're browsing as a guest. Explore the features below, then sign in to get started.
+          </div>
+        </div>
+
+        {/* Feature grid */}
+        <div
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 36 }}
+          className="cd-anim-fade-up"
+        >
+          {features.map((f) => (
+            <div
+              key={f.title}
+              style={{
+                background: f.bg,
+                border: `1px solid ${f.border}`,
+                borderRadius: 16,
+                padding: '16px 14px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 12,
+              }}
+            >
+              <div style={{
+                width: 38, height: 38, borderRadius: 10,
+                background: 'rgba(0,0,0,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: typeof f.icon === 'string' && f.icon.length > 1 ? '1.2rem' : '1.1rem',
+                color: f.color,
+                fontWeight: 700,
+                flexShrink: 0,
+              }}>
+                {f.icon}
+              </div>
+              <div>
+                <div style={{ fontSize: '0.87rem', fontWeight: 700, color: f.color, marginBottom: 2 }}>{f.title}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--cd-text-soft)', lineHeight: 1.4 }}>{f.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }} className="cd-anim-fade-up">
+          <Link
+            to="/login"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '15px 24px', borderRadius: 999,
+              background: 'var(--cd-primary)',
+              color: '#fff', fontWeight: 700, fontSize: '1rem',
+              textDecoration: 'none',
+              boxShadow: '0 10px 28px var(--cd-primary-glow)',
+            }}
+          >
+            Sign In to Your Account
+          </Link>
+          <Link
+            to="/signup"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '15px 24px', borderRadius: 999,
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: 'var(--cd-text)', fontWeight: 600, fontSize: '1rem',
+              textDecoration: 'none',
+            }}
+          >
+            Create Free Account
+          </Link>
         </div>
       </div>
     </div>

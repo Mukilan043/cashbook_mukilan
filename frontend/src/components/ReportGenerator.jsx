@@ -447,36 +447,22 @@ const ReportGenerator = ({ cashbookId }) => {
 
   if (!cashbookId) {
     return (
-      <div 
-        className="max-w-md mx-auto bg-white bg-opacity-95 p-6 rounded-lg shadow-md"
-        style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&q=80)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        <div className="bg-white bg-opacity-90 p-4 rounded-lg">
-          <p className="text-center text-gray-500">Please select a cashbook to generate reports</p>
+      <div className="max-w-md mx-auto cd-card p-6 shadow-md">
+        <div>
+          <p className="text-center" style={{ color: 'var(--cd-text-soft)' }}>Please select a cashbook to generate reports</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div 
-      className="max-w-4xl mx-auto bg-white bg-opacity-95 p-4 sm:p-6 rounded-lg shadow-md mb-20"
-      style={{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&q=80)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}
-    >
-      <div className="bg-white bg-opacity-90 p-4 sm:p-6 rounded-lg">
-        <h2 className="text-2xl font-bold mb-6">Generate Report</h2>
+    <div className="max-w-4xl mx-auto cd-card p-4 sm:p-6 mb-20">
+      <div>
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--cd-text)' }}>Generate Report</h2>
 
         <div className="space-y-4">
           <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="startDate" className="block text-sm font-medium mb-1" style={{ color: 'var(--cd-text)' }}>
               Start Date *
             </label>
             <input
@@ -486,12 +472,12 @@ const ReportGenerator = ({ cashbookId }) => {
               value={filters.startDate}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="cd-input"
             />
           </div>
 
           <div>
-            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="endDate" className="block text-sm font-medium mb-1" style={{ color: 'var(--cd-text)' }}>
               End Date *
             </label>
             <input
@@ -501,12 +487,12 @@ const ReportGenerator = ({ cashbookId }) => {
               value={filters.endDate}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="cd-input"
             />
           </div>
 
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="type" className="block text-sm font-medium mb-1" style={{ color: 'var(--cd-text)' }}>
               Transaction Type
             </label>
             <select
@@ -514,7 +500,7 @@ const ReportGenerator = ({ cashbookId }) => {
               name="type"
               value={filters.type}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="cd-select"
             >
               <option value="all">All Types</option>
               <option value="inflow">Inflow Only</option>
@@ -533,6 +519,7 @@ const ReportGenerator = ({ cashbookId }) => {
           )}
 
           <button
+            type="button"
             onClick={generatePDF}
             disabled={loading}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
@@ -571,15 +558,15 @@ const ReportGenerator = ({ cashbookId }) => {
 
           <div className="mt-6">
             <div className="flex items-center justify-between gap-3 flex-wrap">
-              <h3 className="text-lg font-bold text-gray-900">Summary & Insights</h3>
-              <div className="text-xs text-gray-500">
+              <h3 className="text-lg font-bold" style={{ color: 'var(--cd-text)' }}>Summary & Insights</h3>
+              <div className="text-xs" style={{ color: 'var(--cd-text-soft)' }}>
                 {analyticsLoading ? 'Loading…' : `Loaded ${transactions.length} transactions`}
               </div>
             </div>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm" style={{ color: 'var(--cd-text-soft)' }}>
               Inflow = money in. Outflow = money out. Net = Inflow − Outflow.
             </p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs" style={{ color: 'var(--cd-text-muted)' }}>
               Positive Net means you saved. Negative Net means you spent more than you earned.
             </p>
 
@@ -590,16 +577,16 @@ const ReportGenerator = ({ cashbookId }) => {
             )}
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="bg-white bg-opacity-95 rounded-lg border border-gray-200 p-4">
-                <div className="text-xs text-gray-500">Total Inflow</div>
+              <div className="cd-card p-4">
+                <div className="text-xs" style={{ color: 'var(--cd-text-soft)' }}>Total Inflow</div>
                 <div className="text-lg font-bold text-green-700">{formatMoney(analytics.totalInflow)}</div>
               </div>
-              <div className="bg-white bg-opacity-95 rounded-lg border border-gray-200 p-4">
-                <div className="text-xs text-gray-500">Total Outflow</div>
+              <div className="cd-card p-4">
+                <div className="text-xs" style={{ color: 'var(--cd-text-soft)' }}>Total Outflow</div>
                 <div className="text-lg font-bold text-red-700">{formatMoney(analytics.totalOutflow)}</div>
               </div>
-              <div className="bg-white bg-opacity-95 rounded-lg border border-gray-200 p-4">
-                <div className="text-xs text-gray-500">Net (Inflow − Outflow)</div>
+              <div className="cd-card p-4">
+                <div className="text-xs" style={{ color: 'var(--cd-text-soft)' }}>Net (Inflow − Outflow)</div>
                 <div className={`text-lg font-bold ${analytics.net >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
                   {formatMoney(analytics.net)}
                 </div>

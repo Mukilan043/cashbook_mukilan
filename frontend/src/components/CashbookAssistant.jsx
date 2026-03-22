@@ -140,7 +140,7 @@ const CashbookAssistant = ({
       {/* Panel */}
       {open && (
         <div className={`fixed ${panelBottomClass} ${panelPos} z-50 w-[92vw] max-w-md`}>
-          <div className="overflow-hidden rounded-2xl shadow-2xl border border-white border-opacity-30 backdrop-blur bg-white bg-opacity-90">
+          <div className="cd-card overflow-hidden shadow-2xl">
             <div className="px-4 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
@@ -164,9 +164,14 @@ const CashbookAssistant = ({
                   <div
                     className={
                       m.role === 'user'
-                        ? 'max-w-[85%] rounded-2xl px-3 py-2 bg-indigo-600 text-white shadow'
-                        : 'max-w-[85%] rounded-2xl px-3 py-2 bg-white border border-gray-200 text-gray-900 shadow-sm'
+                        ? 'max-w-[85%] rounded-2xl px-3 py-2 shadow'
+                        : 'max-w-[85%] rounded-2xl px-3 py-2 shadow-sm'
                     }
+                    style={{
+                      background: m.role === 'user' ? 'var(--cd-primary)' : 'var(--cd-surface-2)',
+                      color: m.role === 'user' ? '#fff' : 'var(--cd-text)',
+                      border: m.role !== 'user' ? '1px solid var(--cd-border)' : 'none'
+                    }}
                   >
                     <div className="text-sm whitespace-pre-wrap">{m.text}</div>
                     <div className={m.role === 'user' ? 'text-[10px] opacity-80 mt-1 text-right' : 'text-[10px] text-gray-500 mt-1'}>
@@ -178,7 +183,7 @@ const CashbookAssistant = ({
 
               {loading && (
                 <div className="flex justify-start">
-                  <div className="max-w-[85%] rounded-2xl px-3 py-2 bg-white border border-gray-200 text-gray-700 shadow-sm">
+                  <div className="max-w-[85%] rounded-2xl px-3 py-2 shadow-sm" style={{ background: 'var(--cd-surface-2)', color: 'var(--cd-text)', border: '1px solid var(--cd-border)' }}>
                     <div className="text-sm">Thinking…</div>
                   </div>
                 </div>
@@ -205,7 +210,8 @@ const CashbookAssistant = ({
                     }
                   }}
                   rows={2}
-                  className="flex-1 resize-none px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="cd-input"
+                  style={{ resize: 'none' }}
                   placeholder='Ask: “spent last 7 days?”, “top category this month”, “budget forecast”'
                 />
                 <button

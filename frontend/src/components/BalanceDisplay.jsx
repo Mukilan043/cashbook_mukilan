@@ -28,7 +28,6 @@ const BalanceDisplay = ({ cashbookId }) => {
     }
   };
 
-  // Expose refresh function to parent
   useEffect(() => {
     if (cashbookId) {
       window.refreshBalance = fetchBalance;
@@ -40,10 +39,11 @@ const BalanceDisplay = ({ cashbookId }) => {
 
   if (!cashbookId) {
     return (
-      <div className="bg-white bg-opacity-90 backdrop-blur text-gray-800 p-6 rounded-2xl shadow-xl border border-white border-opacity-30">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Select a Cashbook</h2>
-          <p className="text-sm text-gray-500">Choose a cashbook to view balance</p>
+      <div className="cd-balance-card cd-anim-fade-up">
+        <div style={{ textAlign: 'center', padding: '8px 0' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>📒</div>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--cd-text)' }}>Select a Cashbook</div>
+          <div style={{ fontSize: '0.82rem', color: 'var(--cd-text-soft)', marginTop: 4 }}>Choose a cashbook to view balance</div>
         </div>
       </div>
     );
@@ -51,37 +51,83 @@ const BalanceDisplay = ({ cashbookId }) => {
 
   if (loading) {
     return (
-      <div className="bg-white bg-opacity-90 backdrop-blur text-gray-800 p-6 rounded-2xl shadow-xl border border-white border-opacity-30">
-        <div className="text-center">Loading balance...</div>
+      <div className="cd-balance-card">
+        <div style={{ textAlign: 'center' }}>
+          <div className="cd-skeleton" style={{ height: 20, width: '50%', margin: '0 auto 16px' }} />
+          <div className="cd-skeleton" style={{ height: 40, width: '70%', margin: '0 auto 20px' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="cd-skeleton" style={{ height: 60, borderRadius: 12 }} />
+            <div className="cd-skeleton" style={{ height: 60, borderRadius: 12 }} />
+          </div>
+        </div>
       </div>
     );
   }
 
+  const bal = Number(balance.balance || 0);
+  const isPositive = bal >= 0;
+
   return (
-    <div className="relative overflow-hidden bg-white bg-opacity-90 backdrop-blur text-gray-900 p-4 sm:p-6 rounded-2xl shadow-2xl border border-white border-opacity-30">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-10 -left-10 w-44 h-44 rounded-full bg-blue-500 opacity-15 blur-3xl" />
-        <div className="absolute -bottom-12 -right-10 w-52 h-52 rounded-full bg-indigo-500 opacity-15 blur-3xl" />
+    <div className="cd-balance-card cd-anim-fade-up">
+      {/* Gradient accent strip */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0,
+        height: 3,
+        background: isPositive
+          ? 'var(--cd-success)'
+          : 'var(--cd-danger)',
+        borderRadius: '20px 20px 0 0',
+      }} />
+
+      <div style={{ textAlign: 'center', paddingTop: 8 }}>
+        <div style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', color: 'var(--cd-text-muted)', textTransform: 'uppercase' }}>
+          Current Balance
+        </div>
+        <div style={{
+          fontSize: 'clamp(2rem, 8vw, 3.2rem)',
+          fontWeight: 800,
+          marginTop: 8,
+          color: isPositive ? 'var(--cd-success)' : 'var(--cd-danger)',
+          letterSpacing: '-1px',
+          lineHeight: 1.1,
+        }}>
+          ₹{bal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </div>
+        <div style={{ fontSize: '0.75rem', color: 'var(--cd-text-muted)', marginTop: 4 }}>
+          {isPositive ? '↑ You have positive balance' : '↓ Balance is in deficit'}
+        </div>
       </div>
 
-      <div className="relative flex flex-col items-center">
-        <div className="text-xs font-semibold tracking-wide text-gray-600 uppercase">Current Balance</div>
-        <div className={`mt-2 text-3xl sm:text-5xl font-extrabold drop-shadow-sm ${balance.balance >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
-          Rs {Number(balance.balance || 0).toFixed(2)}
-        </div>
-
-        <div className="mt-5 w-full grid grid-cols-2 gap-3 sm:gap-4">
-          <div className="rounded-xl border border-white border-opacity-30 bg-white bg-opacity-70 p-3 sm:p-4 text-center">
-            <div className="text-[11px] sm:text-xs text-gray-600">Total Inflow</div>
-            <div className="mt-1 text-lg sm:text-xl font-bold text-green-700">
-              Rs {Number(balance.totalInflow || 0).toFixed(2)}
-            </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 20 }}>
+        <div style={{
+          background: 'var(--cd-success-bg)',
+          border: '1px solid rgba(0,200,150,0.2)',
+          borderRadius: 14,
+          padding: '14px 12px',
+          textAlign: 'center',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginBottom: 4 }}>
+            <span style={{ fontSize: 14, color: 'var(--cd-success)' }}>↓</span>
+            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--cd-success)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total In</span>
           </div>
-          <div className="rounded-xl border border-white border-opacity-30 bg-white bg-opacity-70 p-3 sm:p-4 text-center">
-            <div className="text-[11px] sm:text-xs text-gray-600">Total Outflow</div>
-            <div className="mt-1 text-lg sm:text-xl font-bold text-red-700">
-              Rs {Number(balance.totalOutflow || 0).toFixed(2)}
-            </div>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--cd-success)' }}>
+            ₹{Number(balance.totalInflow || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </div>
+        </div>
+        <div style={{
+          background: 'var(--cd-danger-bg)',
+          border: '1px solid rgba(255,92,92,0.2)',
+          borderRadius: 14,
+          padding: '14px 12px',
+          textAlign: 'center',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginBottom: 4 }}>
+            <span style={{ fontSize: 14, color: 'var(--cd-danger)' }}>↑</span>
+            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--cd-danger)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total Out</span>
+          </div>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--cd-danger)' }}>
+            ₹{Number(balance.totalOutflow || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
       </div>

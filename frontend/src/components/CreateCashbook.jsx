@@ -41,16 +41,9 @@ const CreateCashbook = ({ onSuccess }) => {
   };
 
   return (
-    <div 
-      className="bg-white bg-opacity-95 p-6 rounded-lg shadow-md mb-6"
-      style={{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1920&q=80)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}
-    >
-      <div className="bg-white bg-opacity-90 p-6 rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">Add New Cashbook</h2>
+    <div className="cd-card mb-6 p-6" style={{ background: 'var(--cd-surface)' }}>
+      <div className="p-2">
+      <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--cd-text)' }}>Add New Cashbook</h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -64,7 +57,7 @@ const CreateCashbook = ({ onSuccess }) => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="cd-input"
             placeholder="Enter cashbook name"
           />
         </div>
@@ -79,7 +72,7 @@ const CreateCashbook = ({ onSuccess }) => {
             value={formData.description}
             onChange={handleChange}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="cd-input"
             placeholder="Enter description (optional)"
           />
         </div>

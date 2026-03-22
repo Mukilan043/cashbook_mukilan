@@ -1,21 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="CashDiary">
-  <defs>
-    <linearGradient id="frame" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/>
-      <stop offset="0.5" stop-color="#cbd5f5" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#ffffff" stop-opacity="0.85"/>
-    </linearGradient>
-  </defs>
-  <rect x="48" y="48" width="416" height="416" rx="96" fill="#0b0d10"/>
-  <rect x="86" y="86" width="340" height="340" rx="74" fill="none" stroke="url(#frame)" stroke-width="6"/>
-  <text
-    x="256"
-    y="314"
-    text-anchor="middle"
-    font-size="176"
-    font-weight="800"
-    font-family="Segoe UI, Arial, sans-serif"
-    letter-spacing="10"
-    fill="#ffffff"
-  >CD</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0052CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
 </svg>

@@ -168,14 +168,14 @@ const History = ({ cashbookId }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6 mb-20">
+    <div className="cd-card p-4 sm:p-6 mb-20">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
         <h2 className="text-2xl font-bold text-gray-900">History</h2>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="cd-select"
           >
             <option value="all">All Types</option>
             <option value="inflow">Inflow Only</option>
@@ -185,7 +185,7 @@ const History = ({ cashbookId }) => {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="cd-select"
           >
             <option value="date">Sort by Date</option>
             <option value="amount">Sort by Amount</option>
@@ -195,7 +195,7 @@ const History = ({ cashbookId }) => {
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="cd-select"
           >
             <option value="DESC">Descending</option>
             <option value="ASC">Ascending</option>
@@ -218,7 +218,7 @@ const History = ({ cashbookId }) => {
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead style={{ background: 'var(--cd-surface-2)' }}>
               <tr>
                 <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                 <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
@@ -228,7 +228,7 @@ const History = ({ cashbookId }) => {
                 <th className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody style={{ background: 'var(--cd-surface)' }}>
               {transactions.map((transaction) => (
                 <tr key={transaction.id} className="hover:bg-gray-50">
                   {editingId === transaction.id ? (
@@ -239,7 +239,7 @@ const History = ({ cashbookId }) => {
                           name="date"
                           value={editForm.date}
                           onChange={handleEditChange}
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          className="cd-input"
                         />
                       </td>
                       <td className="px-2 sm:px-4 py-3">
@@ -247,7 +247,7 @@ const History = ({ cashbookId }) => {
                           name="type"
                           value={editForm.type}
                           onChange={handleEditChange}
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          className="cd-select"
                         >
                           <option value="inflow">Inflow</option>
                           <option value="outflow">Outflow</option>
@@ -261,7 +261,7 @@ const History = ({ cashbookId }) => {
                           onChange={handleEditChange}
                           step="0.01"
                           min="0.01"
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          className="cd-input"
                         />
                       </td>
                       <td className="px-2 sm:px-4 py-3 hidden sm:table-cell">
@@ -270,7 +270,7 @@ const History = ({ cashbookId }) => {
                             name="category"
                             value={editForm.category || ''}
                             onChange={handleEditChange}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-white"
+                            className="cd-select"
                           >
                             <option value="">No category</option>
                             {availableCategories.map((c) => (
@@ -285,7 +285,7 @@ const History = ({ cashbookId }) => {
                               name="customCategory"
                               value={editForm.customCategory || ''}
                               onChange={handleEditChange}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="cd-input"
                               placeholder="e.g. Pet Care"
                             />
                           )}
@@ -295,7 +295,7 @@ const History = ({ cashbookId }) => {
                             name="description"
                             value={editForm.description}
                             onChange={handleEditChange}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                            className="cd-input"
                             placeholder="Description"
                           />
                         </div>
@@ -329,7 +329,7 @@ const History = ({ cashbookId }) => {
                     </>
                   ) : (
                     <>
-                      <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-3 text-sm whitespace-nowrap" style={{ color: 'var(--cd-text)' }}>
                         {formatDateDisplay(transaction.date)}
                       </td>
                       <td className="px-2 sm:px-4 py-3">
@@ -341,10 +341,10 @@ const History = ({ cashbookId }) => {
                           {transaction.type}
                         </span>
                       </td>
-                      <td className="px-2 sm:px-4 py-3 text-sm font-medium text-gray-900 text-right tabular-nums whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-3 text-sm font-medium text-right tabular-nums whitespace-nowrap" style={{ color: 'var(--cd-text)' }}>
                         Rs {Number(transaction.amount || 0).toFixed(2)}
                       </td>
-                      <td className="px-2 sm:px-4 py-3 text-sm text-gray-500 hidden sm:table-cell text-center">
+                      <td className="px-2 sm:px-4 py-3 text-sm hidden sm:table-cell text-center" style={{ color: 'var(--cd-text-soft)' }}>
                         {(() => {
                           const decoded = decodeDescription(transaction.description || '');
                           return (

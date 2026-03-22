@@ -7,10 +7,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['pwa.svg'],
+      includeAssets: ['cdlogo.png'],
       manifest: {
-        name: 'Cash Book Application',
-        short_name: 'CashBook',
+        name: 'CashDiary',
+        short_name: 'CashDiary',
         description: 'Cash Book Application',
         theme_color: '#4f46e5',
         background_color: '#ffffff',
@@ -18,9 +18,9 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: '/pwa.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
+            src: '/cdlogo.png',
+            sizes: '192x192 512x512',
+            type: 'image/png',
             purpose: 'any maskable',
           },
         ],

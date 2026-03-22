@@ -27,15 +27,12 @@ const Login = () => {
     setError('');
     setInfo('');
     setLoading(true);
-
     const result = await login(formData.identifier, formData.password);
-
     if (result.success) {
       navigate('/');
     } else {
       setError(result.error);
     }
-
     setLoading(false);
   };
 
@@ -43,384 +40,233 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setInfo('');
-
-    if (!forgotEmail) {
-      setError('Email is required');
-      return;
-    }
-
+    if (!forgotEmail) { setError('Email is required'); return; }
     try {
       setLoading(true);
       await authAPI.forgotPasswordVerify(forgotEmail);
       setForgotStep(2);
       setInfo('Email verified. Please set a new password.');
     } catch (err) {
-      if (err.response?.status === 404) {
-        setError('Email not registered. Please enter your registered email.');
-      } else if (err.response?.status === 400) {
-        setError(err.response?.data?.error || 'Email is required');
-      } else if (err.response?.status === 500) {
-        setError(err.response?.data?.error || 'Server error. Please try again.');
-      } else {
-        setError(
-          err.response?.data?.error ||
-          'Failed to verify email. If you are running locally, ensure the backend is running and Vite proxy points /api to your backend (see frontend/vite.config.js).'
-        );
-      }
-    } finally {
-      setLoading(false);
-    }
+      if (err.response?.status === 404) setError('Email not registered.');
+      else setError(err.response?.data?.error || 'Failed to verify email.');
+    } finally { setLoading(false); }
   };
 
   const handleForgotReset = async (e) => {
     e.preventDefault();
     setError('');
     setInfo('');
-
-    if (!newPassword || !confirmPassword) {
-      setError('Please enter and confirm your new password');
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
+    if (!newPassword || !confirmPassword) { setError('Please enter and confirm your new password'); return; }
+    if (newPassword.length < 6) { setError('Password must be at least 6 characters'); return; }
+    if (newPassword !== confirmPassword) { setError('Passwords do not match'); return; }
     try {
       setLoading(true);
       await authAPI.resetPassword(forgotEmail, newPassword);
-      setInfo('Password updated successfully. Please login with your new password.');
-
+      setInfo('Password updated! Please login with your new password.');
       setShowForgot(false);
       setForgotStep(1);
       setNewPassword('');
       setConfirmPassword('');
-      setFormData({ email: forgotEmail, password: '' });
+      setFormData({ identifier: forgotEmail, password: '' });
     } catch (err) {
-      if (err.response?.status === 404) {
-        setError('Email not registered. Please enter your registered email.');
-      } else if (err.response?.status === 400) {
-        setError(err.response?.data?.error || 'Invalid request');
-      } else {
-        setError(err.response?.data?.error || 'Failed to reset password');
-      }
-    } finally {
-      setLoading(false);
-    }
+      setError(err.response?.data?.error || 'Failed to reset password');
+    } finally { setLoading(false); }
   };
 
   const openForgot = () => {
-    setShowForgot(true);
-    setForgotStep(1);
-    setError('');
-    setInfo('');
+    setShowForgot(true); setForgotStep(1); setError(''); setInfo('');
     const looksLikeEmail = formData.identifier.includes('@');
     setForgotEmail(looksLikeEmail ? formData.identifier : '');
-    setNewPassword('');
-    setConfirmPassword('');
-    setShowResetPassword(false);
+    setNewPassword(''); setConfirmPassword(''); setShowResetPassword(false);
   };
 
   const closeForgot = () => {
-    setShowForgot(false);
-    setForgotStep(1);
-    setError('');
-    setInfo('');
-    setForgotEmail('');
-    setNewPassword('');
-    setConfirmPassword('');
-    setShowResetPassword(false);
-  };
-
-  const handleLoginFocus = (e) => {
-    if (e.target.name !== 'password') {
-      setShowPassword(false);
-    }
+    setShowForgot(false); setForgotStep(1); setError(''); setInfo('');
+    setForgotEmail(''); setNewPassword(''); setConfirmPassword(''); setShowResetPassword(false);
   };
 
   return (
-    <div className="cb-auth-stage">
-      <div className="cb-auth-split">
-        <div className="cb-auth-hero">
-          <div className="cb-auth-badge">
-            <img src="/cdlogo.png" alt="CashDiary" className="cb-auth-logo" />
+    <div className="cd-auth-page">
+      <div className="cd-auth-card cd-anim-scale-pop">
+        {/* Logo */}
+        <div className="cd-auth-logo-wrap">
+          <div className="cd-auth-logo-icon" style={{ overflow: 'hidden', padding: 0 }}>
+            <img src="/cdlogo.png" alt="CashDiary Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
-          <h1 className="cb-font-display">Welcome to Cash Book</h1>
-          <p>Track inflow, outflow, and balances with clean summaries and instant reports.</p>
-          <p>Stay on top of your Cash flow with a Simple,focused Dashboard.</p>
-          <div className="cb-auth-links" style={{ color: '#f8fafc' }}>
-            
-          </div>
-          <div className="cb-auth-mini-grid">
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--green">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 4v16" />
-                  <path d="M6 14l6 6 6-6" />
-                </svg>
-              </div>
-              <div>
-                <h4>Cash Inflow</h4>
-                <p>Record income in seconds.</p>
-              </div>
-            </div>
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--rose">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 20V4" />
-                  <path d="M6 10l6-6 6 6" />
-                </svg>
-              </div>
-              <div>
-                <h4>Cash Outflow</h4>
-                <p>Track expenses and vendors.</p>
-              </div>
-            </div>
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--blue">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 4h16v16H4z" />
-                  <path d="M8 12h8" />
-                  <path d="M8 16h5" />
-                </svg>
-              </div>
-              <div>
-                <h4>Reports & History</h4>
-                <p>Export PDF summaries.</p>
-              </div>
-            </div>
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--teal">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 7h16" />
-                  <path d="M4 12h16" />
-                  <path d="M4 17h16" />
-                </svg>
-              </div>
-              <div>
-                <h4>View & Manage</h4>
-                <p>Edit or delete entries.</p>
-              </div>
-            </div>
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--amber">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 4h12v16H6z" />
-                  <path d="M9 8h6" />
-                  <path d="M9 12h6" />
-                </svg>
-              </div>
-              <div>
-                <h4>Full History</h4>
-                <p>See every transaction.</p>
-              </div>
-            </div>
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--violet">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 6h16" />
-                  <path d="M7 10h10" />
-                  <path d="M10 14h4" />
-                  <path d="M6 18h12" />
-                </svg>
-              </div>
-              <div>
-                <h4>Multiple Cashbooks</h4>
-                <p>Organize by projects.</p>
-              </div>
+          <div>
+            <div className="cd-logo-text" style={{ fontSize: '1.5rem' }}>CashDiary</div>
+            <div className="cd-auth-subtitle">
+              {showForgot ? 'Reset your password' : 'Sign in to your account'}
             </div>
           </div>
-          <div className="cb-auth-footer" style={{ color: '#f8fafc' }}>
-            Join thousands tracking cash daily with clarity.
-          </div>
-          <div className="cb-auth-streaks" />
         </div>
 
-        <div className="cb-auth-form">
-          <h2>{showForgot ? 'Reset Access' : 'User Login'}</h2>
-          <h3 className="cb-font-display">{showForgot ? 'Update your password' : 'Sign in to Cash Book'}</h3>
-          <p>{showForgot ? 'Verify your email and set a new password.' : 'Use your email, phone, or username and password to continue.'}</p>
+        {/* Alerts */}
+        {info && <div className="cd-alert cd-alert-success" style={{ marginBottom: 16 }}>{info}</div>}
+        {error && <div className="cd-alert cd-alert-danger" style={{ marginBottom: 16 }}>{error}</div>}
 
-          {info && (
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-              {info}
-            </div>
-          )}
-          {error && (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-              {error}
-            </div>
-          )}
+        {showForgot ? (
+          <form onSubmit={forgotStep === 1 ? handleForgotVerify : handleForgotReset} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <label className="cd-label">Email address</label>
+            <label className="cd-input-group">
+              <span className="cd-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/>
+                </svg>
+              </span>
+              <input
+                type="email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                required
+                disabled={loading || forgotStep === 2}
+                placeholder="your@email.com"
+                style={{ color: 'var(--cd-text)' }}
+              />
+            </label>
 
-          {showForgot ? (
-            <form onSubmit={forgotStep === 1 ? handleForgotVerify : handleForgotReset} className="space-y-4">
-              <label className="cb-auth-field">
-                <span className="cb-auth-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M4 4h16v16H4z" stroke="none" />
-                    <path d="M4 4h16v16H4z" />
-                    <path d="M4 4l8 8 8-8" />
-                  </svg>
-                </span>
-                <input
-                  type="email"
-                  id="forgotEmail"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  required
-                  disabled={loading || forgotStep === 2}
-                  placeholder="Email address"
-                />
-              </label>
-
-              {forgotStep === 2 && (
-                <>
-                  <label className="cb-auth-field">
-                    <span className="cb-auth-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="4" y="10" width="16" height="10" rx="2" />
-                        <path d="M8 10V7a4 4 0 018 0v3" />
-                      </svg>
-                    </span>
-                    <input
-                      type={showResetPassword ? 'text' : 'password'}
-                      id="newPassword"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                      disabled={loading}
-                      placeholder="New password"
-                    />
-                  </label>
-
-                  <label className="cb-auth-field">
-                    <span className="cb-auth-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="4" y="10" width="16" height="10" rx="2" />
-                        <path d="M8 10V7a4 4 0 018 0v3" />
-                      </svg>
-                    </span>
-                    <input
-                      type={showResetPassword ? 'text' : 'password'}
-                      id="confirmPassword"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      disabled={loading}
-                      placeholder="Confirm password"
-                    />
-                  </label>
-
-                  <label className="cb-auth-links">
-                    <span>
-                      <input
-                        type="checkbox"
-                        checked={showResetPassword}
-                        onChange={(e) => setShowResetPassword(e.target.checked)}
-                        disabled={loading}
-                        className="rounded border-slate-300"
-                      />
-                      <span className="ml-2">Show password</span>
-                    </span>
-                  </label>
-                </>
-              )}
-
-              <button type="submit" disabled={loading} className="cb-auth-action">
-                {loading
-                  ? (forgotStep === 1 ? 'Verifying…' : 'Updating…')
-                  : (forgotStep === 1 ? 'Verify Email' : 'Update Password')}
-              </button>
-              <button type="button" onClick={closeForgot} disabled={loading} className="cb-auth-footer">
-                Cancel
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleSubmit} onFocusCapture={handleLoginFocus} className="space-y-4">
-              <label className="cb-auth-field">
-                <span className="cb-auth-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
-                    <path d="M20 20c-1.5-2.5-4.1-4-8-4s-6.5 1.5-8 4" />
-                  </svg>
-                </span>
-                <input
-                  type="text"
-                  id="identifier"
-                  name="identifier"
-                  value={formData.identifier}
-                  onChange={handleChange}
-                  required
-                  placeholder="Email / Phone / Username"
-                />
-              </label>
-
-              <label className="cb-auth-field">
-                <span className="cb-auth-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="4" y="10" width="16" height="10" rx="2" />
-                    <path d="M8 10V7a4 4 0 018 0v3" />
-                  </svg>
-                </span>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  onBlur={() => setShowPassword(false)}
-                  required
-                  placeholder="Password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="cb-auth-icon"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? (
+            {forgotStep === 2 && (
+              <>
+                <label className="cd-label">New password</label>
+                <label className="cd-input-group">
+                  <span className="cd-input-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
-                      <path d="M15 9l-6 6" />
-                      <path d="M9.5 9.5a3 3 0 014 4" />
-                      <path d="M14.5 14.5a3 3 0 01-4-4" />
+                      <rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>
                     </svg>
-                  ) : (
+                  </span>
+                  <input
+                    type={showResetPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    placeholder="New password"
+                    style={{ color: 'var(--cd-text)' }}
+                  />
+                </label>
+
+                <label className="cd-label">Confirm password</label>
+                <label className="cd-input-group">
+                  <span className="cd-input-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
-                      <circle cx="12" cy="12" r="3" />
+                      <rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>
                     </svg>
-                  )}
-                </button>
-              </label>
+                  </span>
+                  <input
+                    type={showResetPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    placeholder="Confirm password"
+                    style={{ color: 'var(--cd-text)' }}
+                  />
+                </label>
 
-              <div className="cb-auth-links">
-                <span>
-                  <input type="checkbox" className="rounded border-slate-300" />
-                  <span className="ml-2">Remember me</span>
-                </span>
-                <button type="button" onClick={openForgot}>Forgot password?</button>
-              </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.83rem', color: 'var(--cd-text-soft)', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={showResetPassword}
+                    onChange={(e) => setShowResetPassword(e.target.checked)}
+                    disabled={loading}
+                  />
+                  Show password
+                </label>
+              </>
+            )}
 
-              <button type="submit" disabled={loading} className="cb-auth-action">
-                {loading ? 'Signing in...' : 'Login'}
+            <button type="submit" disabled={loading} className="cd-btn cd-btn-primary cd-btn-full" style={{ marginTop: 4 }}>
+              {loading
+                ? (forgotStep === 1 ? 'Verifying…' : 'Updating…')
+                : (forgotStep === 1 ? 'Verify Email' : 'Update Password')}
+            </button>
+            <button type="button" onClick={closeForgot} disabled={loading} className="cd-btn cd-btn-ghost cd-btn-full">
+              Cancel
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <label className="cd-label">Email / Phone / Username</label>
+            <label className="cd-input-group">
+              <span className="cd-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/>
+                  <path d="M20 20c-1.5-2.5-4.1-4-8-4s-6.5 1.5-8 4"/>
+                </svg>
+              </span>
+              <input
+                type="text"
+                id="identifier"
+                name="identifier"
+                value={formData.identifier}
+                onChange={handleChange}
+                required
+                placeholder="Email / phone / username"
+                style={{ color: 'var(--cd-text)' }}
+              />
+            </label>
+
+            <label className="cd-label">Password</label>
+            <label className="cd-input-group">
+              <span className="cd-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>
+                </svg>
+              </span>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                onBlur={() => setShowPassword(false)}
+                required
+                placeholder="Your password"
+                style={{ color: 'var(--cd-text)' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((p) => !p)}
+                className="cd-input-icon"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/>
+                    <path d="M15 9l-6 6"/><path d="M9.5 9.5a3 3 0 014 4"/><path d="M14.5 14.5a3 3 0 01-4-4"/>
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                )}
               </button>
-            </form>
-          )}
+            </label>
 
-          <div className="cb-auth-footer">
-            New here?{' '}
-            <Link to="/signup">Create an account</Link>
-          </div>
-          <div className="cb-auth-footer">
-            <Link to="/">← Back to home</Link>
-          </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.82rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--cd-text-soft)', cursor: 'pointer' }}>
+                <input type="checkbox" style={{ accentColor: 'var(--cd-primary)' }} />
+                Remember me
+              </label>
+              <button type="button" onClick={openForgot} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cd-primary)', fontWeight: 600, fontFamily: 'inherit', fontSize: '0.82rem' }}>
+                Forgot password?
+              </button>
+            </div>
+
+            <button type="submit" disabled={loading} className="cd-btn cd-btn-primary cd-btn-full" style={{ marginTop: 4 }}>
+              {loading ? 'Signing in…' : 'Sign In'}
+            </button>
+          </form>
+        )}
+
+        <div style={{ textAlign: 'center', marginTop: 20, fontSize: '0.85rem', color: 'var(--cd-text-soft)' }}>
+          New here?{' '}
+          <Link to="/signup" className="cd-auth-link">Create an account</Link>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 8, fontSize: '0.82rem' }}>
+          <Link to="/" className="cd-auth-link" style={{ opacity: 0.7 }}>← Back to home</Link>
         </div>
       </div>
     </div>

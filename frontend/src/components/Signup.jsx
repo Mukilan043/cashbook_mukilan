@@ -14,9 +14,6 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const hidePasswordNow = () => setShowPassword(false);
-  const hideConfirmPasswordNow = () => setShowConfirmPassword(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
 
@@ -27,293 +24,170 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
     }
-
     setLoading(true);
-
     const { confirmPassword, ...userData } = formData;
     const result = await signup(userData);
-    
     if (result.success) {
       navigate('/');
     } else {
       setError(result.error);
     }
-    
     setLoading(false);
   };
 
-  const handleFormFocus = (e) => {
-    const { name } = e.target;
+  const fields = [
+    {
+      name: 'username',
+      placeholder: 'Username',
+      type: 'text',
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/>
+          <path d="M20 20c-1.5-2.5-4.1-4-8-4s-6.5 1.5-8 4"/>
+        </svg>
+      ),
+    },
+    {
+      name: 'email',
+      placeholder: 'Email address',
+      type: 'email',
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/>
+        </svg>
+      ),
+    },
+    {
+      name: 'mobile',
+      placeholder: 'Mobile number',
+      type: 'tel',
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1"/>
+        </svg>
+      ),
+    },
+  ];
 
-    if (name !== 'password') {
-      setShowPassword(false);
-    }
+  const EyeOpen = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/><circle cx="12" cy="12" r="3"/>
+    </svg>
+  );
 
-    if (name !== 'confirmPassword') {
-      setShowConfirmPassword(false);
-    }
-  };
+  const EyeClosed = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/>
+      <path d="M15 9l-6 6"/><path d="M9.5 9.5a3 3 0 014 4"/><path d="M14.5 14.5a3 3 0 01-4-4"/>
+    </svg>
+  );
+
+  const LockIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>
+    </svg>
+  );
 
   return (
-    <div className="cb-auth-stage">
-      <div className="cb-auth-split">
-        <div className="cb-auth-hero">
-          <div className="cb-auth-badge">
-            <img src="/cdlogo.png" alt="CashDiary" className="cb-auth-logo" />
+    <div className="cd-auth-page">
+      <div className="cd-auth-card cd-anim-scale-pop" style={{ maxWidth: 480 }}>
+        {/* Logo */}
+        <div className="cd-auth-logo-wrap">
+          <div className="cd-auth-logo-icon" style={{ overflow: 'hidden', padding: 0 }}>
+            <img src="/cdlogo.png" alt="CashDiary Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
-          <h1 className="cb-font-display">Create your Cash Book</h1>
-          <p>Start tracking your income and expenses in one clean, focused space.</p>
-          <p>Export clear PDF reports and keep your balance in view.</p>
-          <div className="cb-auth-mini-grid">
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--green">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 4v16" />
-                  <path d="M6 14l6 6 6-6" />
-                </svg>
-              </div>
-              <div>
-                <h4>Cash Inflow</h4>
-                <p>Capture income fast.</p>
-              </div>
-            </div>
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--rose">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 20V4" />
-                  <path d="M6 10l6-6 6 6" />
-                </svg>
-              </div>
-              <div>
-                <h4>Cash Outflow</h4>
-                <p>Track every expense.</p>
-              </div>
-            </div>
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--blue">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 4h16v16H4z" />
-                  <path d="M8 12h8" />
-                  <path d="M8 16h5" />
-                </svg>
-              </div>
-              <div>
-                <h4>Reports & History</h4>
-                <p>Printable PDF exports.</p>
-              </div>
-            </div>
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--teal">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 7h16" />
-                  <path d="M4 12h16" />
-                  <path d="M4 17h16" />
-                </svg>
-              </div>
-              <div>
-                <h4>View & Manage</h4>
-                <p>Update entries any time.</p>
-              </div>
-            </div>
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--amber">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 4h12v16H6z" />
-                  <path d="M9 8h6" />
-                  <path d="M9 12h6" />
-                </svg>
-              </div>
-              <div>
-                <h4>Full History</h4>
-                <p>Review every record.</p>
-              </div>
-            </div>
-            <div className="cb-auth-mini-card cb-anim-fade-in-up">
-              <div className="cb-auth-mini-icon cb-auth-mini-icon--violet">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 6h16" />
-                  <path d="M7 10h10" />
-                  <path d="M10 14h4" />
-                  <path d="M6 18h12" />
-                </svg>
-              </div>
-              <div>
-                <h4>Multiple Cashbooks</h4>
-                <p>Separate by project.</p>
-              </div>
-            </div>
+          <div>
+            <div className="cd-logo-text" style={{ fontSize: '1.5rem' }}>CashDiary</div>
+            <div className="cd-auth-subtitle">Create your free account</div>
           </div>
-          <div className="cb-auth-streaks" />
         </div>
 
-        <div className="cb-auth-form">
-          <h2>New Account</h2>
-          <h3 className="cb-font-display">Sign up for Cash Book</h3>
-          <p>Fill in the details below to create your account.</p>
+        {error && <div className="cd-alert cd-alert-danger" style={{ marginBottom: 16 }}>{error}</div>}
 
-          {error && (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} onFocusCapture={handleFormFocus} className="space-y-4">
-            <label className="cb-auth-field">
-              <span className="cb-auth-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
-                  <path d="M20 20c-1.5-2.5-4.1-4-8-4s-6.5 1.5-8 4" />
-                </svg>
-              </span>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {fields.map((f) => (
+            <label key={f.name} className="cd-input-group">
+              <span className="cd-input-icon">{f.icon}</span>
               <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
+                type={f.type}
+                name={f.name}
+                value={formData[f.name]}
                 onChange={handleChange}
                 required
-                placeholder="Username"
+                placeholder={f.placeholder}
+                style={{ color: 'var(--cd-text)' }}
               />
             </label>
+          ))}
 
-            <label className="cb-auth-field">
-              <span className="cb-auth-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 4h16v16H4z" stroke="none" />
-                  <path d="M4 4h16v16H4z" />
-                  <path d="M4 4l8 8 8-8" />
-                </svg>
-              </span>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                placeholder="Email address"
-              />
-            </label>
-
-            <label className="cb-auth-field">
-              <span className="cb-auth-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M5 4h14v16H5z" />
-                  <path d="M8 20h8" />
-                </svg>
-              </span>
-              <input
-                type="tel"
-                id="mobile"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleChange}
-                required
-                placeholder="Mobile number"
-              />
-            </label>
-
-            <label className="cb-auth-field">
-              <span className="cb-auth-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="4" y="10" width="16" height="10" rx="2" />
-                  <path d="M8 10V7a4 4 0 018 0v3" />
-                </svg>
-              </span>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                onBlur={hidePasswordNow}
-                required
-                minLength={6}
-                placeholder="Password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="cb-auth-icon"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
-                    <path d="M15 9l-6 6" />
-                    <path d="M9.5 9.5a3 3 0 014 4" />
-                    <path d="M14.5 14.5a3 3 0 01-4-4" />
-                  </svg>
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
-            </label>
-
-            <label className="cb-auth-field">
-              <span className="cb-auth-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="4" y="10" width="16" height="10" rx="2" />
-                  <path d="M8 10V7a4 4 0 018 0v3" />
-                </svg>
-              </span>
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                onBlur={hideConfirmPasswordNow}
-                required
-                placeholder="Confirm password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="cb-auth-icon"
-                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-              >
-                {showConfirmPassword ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
-                    <path d="M15 9l-6 6" />
-                    <path d="M9.5 9.5a3 3 0 014 4" />
-                    <path d="M14.5 14.5a3 3 0 01-4-4" />
-                  </svg>
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
-            </label>
-
-            <button type="submit" disabled={loading} className="cb-auth-action">
-              {loading ? 'Creating account...' : 'Create account'}
+          {/* Password */}
+          <label className="cd-input-group">
+            <span className="cd-input-icon"><LockIcon /></span>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              onBlur={() => setShowPassword(false)}
+              required
+              minLength={6}
+              placeholder="Password"
+              style={{ color: 'var(--cd-text)' }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((p) => !p)}
+              className="cd-input-icon"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeClosed /> : <EyeOpen />}
             </button>
-          </form>
+          </label>
 
-          <div className="cb-auth-footer">
-            Already have an account?{' '}
-            <Link to="/login">Login</Link>
-          </div>
-          <div className="cb-auth-footer">
-            <Link to="/">← Back to home</Link>
-          </div>
+          {/* Confirm Password */}
+          <label className="cd-input-group">
+            <span className="cd-input-icon"><LockIcon /></span>
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              onBlur={() => setShowConfirmPassword(false)}
+              required
+              placeholder="Confirm password"
+              style={{ color: 'var(--cd-text)' }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((p) => !p)}
+              className="cd-input-icon"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              aria-label={showConfirmPassword ? 'Hide' : 'Show'}
+            >
+              {showConfirmPassword ? <EyeClosed /> : <EyeOpen />}
+            </button>
+          </label>
+
+          <button type="submit" disabled={loading} className="cd-btn cd-btn-primary cd-btn-full" style={{ marginTop: 4 }}>
+            {loading ? 'Creating account…' : 'Create Account'}
+          </button>
+        </form>
+
+        <div style={{ textAlign: 'center', marginTop: 20, fontSize: '0.85rem', color: 'var(--cd-text-soft)' }}>
+          Already have an account?{' '}
+          <Link to="/login" className="cd-auth-link">Sign In</Link>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 8, fontSize: '0.82rem' }}>
+          <Link to="/" className="cd-auth-link" style={{ opacity: 0.7 }}>← Back to home</Link>
         </div>
       </div>
     </div>
@@ -321,4 +195,3 @@ const Signup = () => {
 };
 
 export default Signup;
-

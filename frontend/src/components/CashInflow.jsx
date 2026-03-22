@@ -215,7 +215,8 @@ const CashInflow = ({ cashbookId, onDone }) => {
       return;
     }
     
-    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+    if (!formData.amount || isNaN(parseFloat(formData.amount)) || parseFloat(formData.amount) <= 0) {
+      window.alert('Please enter the amount');
       setMessage({ type: 'error', text: 'Please enter a valid amount greater than 0' });
       return;
     }
@@ -347,8 +348,8 @@ const CashInflow = ({ cashbookId, onDone }) => {
   const showOutflowSection = inflowItems.length > 0 && outflowItems.length > 0;
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-green-600 mb-6">Cash Inflow</h2>
+    <div className="max-w-md mx-auto cd-card" style={{ padding: '24px' }}>
+      <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--cd-success)' }}>Cash Inflow</h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div
@@ -425,7 +426,7 @@ const CashInflow = ({ cashbookId, onDone }) => {
                         value={item.name}
                         onChange={(e) => handleReceiptItemChange(index, 'name', e.target.value)}
                         readOnly={!editingItems.includes(key)}
-                        className="col-span-4 w-full rounded-md border border-green-200 px-2 py-1 text-sm"
+                        className="col-span-4 w-full cd-input text-sm"
                         placeholder="Item name"
                       />
                       <input
@@ -433,7 +434,7 @@ const CashInflow = ({ cashbookId, onDone }) => {
                         value={item.amount}
                         onChange={(e) => handleReceiptItemChange(index, 'amount', e.target.value)}
                         readOnly={!editingItems.includes(key)}
-                        className="col-span-2 w-full rounded-md border border-green-200 px-2 py-1 text-sm"
+                        className="col-span-2 w-full cd-input text-sm"
                         placeholder="Amount"
                       />
                       <div className="relative col-span-1 flex justify-end">
@@ -576,8 +577,7 @@ const CashInflow = ({ cashbookId, onDone }) => {
             onChange={handleChange}
             step="0.01"
             min="0.01"
-            required
-            className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            className="cd-input" style={{ borderColor: 'var(--cd-success)' }}
             placeholder="Enter amount"
           />
         </div>
@@ -618,7 +618,7 @@ const CashInflow = ({ cashbookId, onDone }) => {
             name="description"
             value={formData.description}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            className="cd-input" style={{ borderColor: 'var(--cd-success)' }}
             placeholder="Enter description (optional)"
           />
           {voiceError && (
@@ -635,7 +635,7 @@ const CashInflow = ({ cashbookId, onDone }) => {
             name="category"
             value={formData.category}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
+            className="cd-select" style={{ borderColor: 'var(--cd-success)' }}
           >
             <option value="">Auto-detect</option>
             {DEFAULT_CATEGORIES.map((c) => (
@@ -649,7 +649,7 @@ const CashInflow = ({ cashbookId, onDone }) => {
               name="customCategory"
               value={formData.customCategory}
               onChange={handleChange}
-              className="mt-2 w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="cd-input mt-2" style={{ borderColor: 'var(--cd-success)' }}
               placeholder="e.g. Pet Care"
             />
           )}
@@ -666,7 +666,7 @@ const CashInflow = ({ cashbookId, onDone }) => {
             value={formData.date}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            className="cd-input" style={{ borderColor: 'var(--cd-success)' }}
           />
         </div>
 

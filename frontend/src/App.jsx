@@ -20,6 +20,7 @@ import { formatDateDisplay } from './utils/dateFormat';
 import { transactionAPI } from './services/api';
 import CashbookAssistant from './components/CashbookAssistant';
 
+/* ─── CashbookView ──────────────────────────────────────────── */
 const CashbookView = () => {
   const { cashbookId } = useParams();
   const { isGuest } = useAuth();
@@ -38,16 +39,11 @@ const CashbookView = () => {
     location.pathname === `/cashbook/${cashbookId}` ||
     location.pathname === `/cashbook/${cashbookId}/`
   );
-
   const isAddingMode = showInflow || showOutflow;
 
   useEffect(() => {
-    if (cashbookId && !isGuest) {
-      fetchCashbook();
-    }
-    if (!isGuest) {
-      fetchCashbooks();
-    }
+    if (cashbookId && !isGuest) fetchCashbook();
+    if (!isGuest) fetchCashbooks();
   }, [cashbookId, isGuest]);
 
   useEffect(() => {
@@ -59,57 +55,42 @@ const CashbookView = () => {
     if (!cashbookId) return;
     try {
       setRecentLoading(true);
-      const data = await transactionAPI.getAll(cashbookId, {
-        sortBy: 'date',
-        sortOrder: 'ASC',
-      });
+      const data = await transactionAPI.getAll(cashbookId, { sortBy: 'date', sortOrder: 'ASC' });
       const arr = Array.isArray(data) ? data : [];
-
       const chronological = [...arr].sort((a, b) => {
         const dateDiff = new Date(a.date) - new Date(b.date);
         if (dateDiff !== 0) return dateDiff;
-
         const aCreated = a.created_at ? new Date(a.created_at) : null;
         const bCreated = b.created_at ? new Date(b.created_at) : null;
         if (aCreated && bCreated) {
           const createdDiff = aCreated - bCreated;
           if (createdDiff !== 0) return createdDiff;
         }
-
         return Number(a.id) - Number(b.id);
       });
-
       let balance = 0;
       const balanceById = new Map();
       for (const t of chronological) {
         const amount = Number(t.amount || 0);
-        if (t.type === 'inflow') {
-          balance += amount;
-        } else {
-          balance -= amount;
-        }
+        if (t.type === 'inflow') balance += amount;
+        else balance -= amount;
         balanceById.set(t.id, balance);
       }
-
       const desc = [...arr].sort((a, b) => {
         const dateDiff = new Date(b.date) - new Date(a.date);
         if (dateDiff !== 0) return dateDiff;
-
         const aCreated = a.created_at ? new Date(a.created_at) : null;
         const bCreated = b.created_at ? new Date(b.created_at) : null;
         if (aCreated && bCreated) {
           const createdDiff = bCreated - aCreated;
           if (createdDiff !== 0) return createdDiff;
         }
-
         return Number(b.id) - Number(a.id);
       });
-
       const latestFive = desc.slice(0, 5).map((t) => ({
         ...t,
         runningBalance: Number(balanceById.get(t.id) ?? 0),
       }));
-
       setRecentTransactions(latestFive);
     } catch (error) {
       console.error('Error fetching recent transactions:', error);
@@ -119,15 +100,11 @@ const CashbookView = () => {
     }
   };
 
-  // Close inflow/outflow panel when navigating to other pages (history/report)
   useEffect(() => {
     if (!cashbookId) return;
     const path = location.pathname;
-    const shouldCloseInlinePanels =
-      path.includes('/history') ||
-      path.includes('/report');
-
-    if (shouldCloseInlinePanels && (showInflow || showOutflow)) {
+    const shouldClose = path.includes('/history') || path.includes('/report');
+    if (shouldClose && (showInflow || showOutflow)) {
       setShowInflow(false);
       setShowOutflow(false);
     }
@@ -138,34 +115,22 @@ const CashbookView = () => {
       const data = await cashbookAPI.getAll();
       setCashbooks(data);
       if (cashbookId) {
-        const found = data.find(cb => cb.id === parseInt(cashbookId));
+        const found = data.find((cb) => cb.id === parseInt(cashbookId));
         setSelectedCashbook(found);
       }
-    } catch (error) {
-      console.error('Error fetching cashbooks:', error);
-    }
+    } catch (error) { console.error('Error fetching cashbooks:', error); }
   };
 
   const fetchCashbook = async () => {
     try {
       const data = await cashbookAPI.getById(cashbookId);
       setSelectedCashbook(data);
-    } catch (error) {
-      console.error('Error fetching cashbook:', error);
-    }
+    } catch (error) { console.error('Error fetching cashbook:', error); }
   };
 
   const handleOpenSidebar = (type) => {
-    if (isGuest) {
-      alert('Please login to add transactions');
-      return;
-    }
-    if (!cashbookId) {
-      alert('Please select a cashbook first');
-      return;
-    }
-
-    // Ensure only one view is open at a time
+    if (isGuest) { alert('Please login to add transactions'); return; }
+    if (!cashbookId) { alert('Please select a cashbook first'); return; }
     navigate(`/cashbook/${cashbookId}`);
     setShowInflow(type === 'inflow');
     setShowOutflow(type === 'outflow');
@@ -182,265 +147,229 @@ const CashbookView = () => {
 
   const handleSidebarSuccess = () => {
     if (window.refreshBalance) window.refreshBalance();
-    // Refresh transactions if on history page
     window.location.reload();
   };
 
   const handleCashbookChange = (e) => {
     const id = e.target.value;
-    if (id) {
-      navigate(`/cashbook/${id}`);
-    }
+    if (id) navigate(`/cashbook/${id}`);
   };
 
-
-  if (isGuest) {
-    return <GuestView />;
-  }
+  if (isGuest) return <GuestView />;
 
   return (
-    <div 
-      className="min-h-screen bg-gray-100 pb-20"
-      style={{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&q=80)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
-    >
-      <div className="bg-black bg-opacity-65 min-h-screen">
-        <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-3xl sm:text-4xl font-bold text-center mb-4 text-white drop-shadow-lg">
-              CashDairy
-            </h1>
-            
-            {/* Cashbook Selector */}
-            <div className="mb-4">
-              <label htmlFor="cashbook-select" className="block text-sm font-medium text-white mb-2 drop-shadow">
-                Select Cashbook:
-              </label>
-              <select
-                id="cashbook-select"
-                value={cashbookId || ''}
-                onChange={handleCashbookChange}
-                className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              >
-                <option value="">-- Select Cashbook --</option>
-                {cashbooks.map((cb) => (
-                  <option key={cb.id} value={cb.id}>
-                    {cb.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {!isAddingMode && (
-            <>
-              {/* Balance Display */}
-              <div className="mb-6">
-                <BalanceDisplay cashbookId={cashbookId} />
-              </div>
-
-              {/* Recent Transactions (latest 5) */}
-              {cashbookId && isCashbookHome && (
-                <div className="mb-6">
-                  <div className="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-2xl border border-white border-opacity-30 overflow-hidden">
-                    <div className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
-                      <div>
-                        <h3 className="text-base sm:text-lg font-bold text-gray-900">Recent Transactions</h3>
-                        <p className="text-xs text-gray-600">Latest 5 inflow/outflow entries</p>
-                      </div>
-                      <button
-                        onClick={() => navigate(`/cashbook/${cashbookId}/history`)}
-                        className="text-sm font-semibold text-indigo-700 hover:text-indigo-800"
-                      >
-                        View all
-                      </button>
-                    </div>
-
-                    <div className="border-t border-gray-200" />
-
-                    {recentLoading ? (
-                      <div className="px-4 sm:px-6 py-4 text-sm text-gray-600">Loading…</div>
-                    ) : recentTransactions.length === 0 ? (
-                      <div className="px-4 sm:px-6 py-6 text-sm text-gray-600">
-                        No recent transactions yet.
-                      </div>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                              <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                              <th className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
-                              <th className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Description</th>
-                              <th className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Balance</th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {recentTransactions.map((t) => {
-                              const decoded = decodeDescription(t.description || '');
-                              return (
-                                <tr key={t.id} className="hover:bg-gray-50">
-                                  <td className="px-2 sm:px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{formatDateDisplay(t.date)}</td>
-                                  <td className="px-2 sm:px-4 py-3">
-                                    <span className={`px-2 py-1 text-xs rounded-full ${
-                                      t.type === 'inflow'
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-red-100 text-red-800'
-                                    }`}>
-                                      {t.type}
-                                    </span>
-                                  </td>
-                                  <td className="px-2 sm:px-4 py-3 text-sm font-medium text-gray-900 text-right tabular-nums whitespace-nowrap">
-                                    Rs {Number(t.amount || 0).toFixed(2)}
-                                  </td>
-                                  <td className="px-2 sm:px-4 py-3 text-sm text-gray-500 hidden sm:table-cell text-center">
-                                    <div className="flex items-center justify-center gap-2 flex-wrap">
-                                      {decoded.category && (
-                                        <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 font-semibold">
-                                          {decoded.category}
-                                        </span>
-                                      )}
-                                      <span>{decoded.description || '-'}</span>
-                                    </div>
-                                  </td>
-                                  <td className="px-2 sm:px-4 py-3 text-sm font-semibold text-right tabular-nums whitespace-nowrap">
-                                    {(() => {
-                                      const bal = Number(t.runningBalance || 0);
-                                      return (
-                                        <span className={bal >= 0 ? 'text-emerald-700' : 'text-rose-700'}>
-                                          Rs {bal.toFixed(2)}
-                                        </span>
-                                      );
-                                    })()}
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Inline Inflow / Outflow panels */}
-          {showInflow && (
-            <div className="mb-6">
-              <div className="bg-white bg-opacity-95 rounded-lg shadow p-4">
-                <CashInflow
-                  cashbookId={cashbookId}
-                  onDone={() => {
-                    fetchRecentTransactions();
-                    setShowInflow(false);
-                    navigate(`/cashbook/${cashbookId}`);
-                  }}
-                />
-              </div>
-            </div>
-          )}
-          {showOutflow && (
-            <div className="mb-6">
-              <div className="bg-white bg-opacity-95 rounded-lg shadow p-4">
-                <CashOutflow
-                  cashbookId={cashbookId}
-                  onDone={() => {
-                    fetchRecentTransactions();
-                    setShowOutflow(false);
-                    navigate(`/cashbook/${cashbookId}`);
-                  }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Routes */}
-          <Routes>
-            <Route 
-              path="history" 
-              element={
-                <div>
-                  <BackButton />
-                  <History cashbookId={cashbookId} />
-                </div>
-              } 
-            />
-            <Route 
-              path="report" 
-              element={
-                <div>
-                  <BackButton />
-                  <ReportGenerator cashbookId={cashbookId} />
-                </div>
-              } 
-            />
-            <Route 
-              path="" 
-              element={
-                <div className="py-2" />
-              } 
-            />
-          </Routes>
-
-          {/* Sidebar */}
-          <Sidebar
-            isOpen={sidebarOpen}
-            onClose={handleCloseSidebar}
-            type={sidebarType}
-            cashbookId={cashbookId}
-            onSuccess={handleSidebarSuccess}
-          />
-
-          {/* Bottom Navigation */}
-          <BottomNavigation
-            cashbookId={cashbookId}
-            onInflowClick={() => handleOpenSidebar('inflow')}
-            onOutflowClick={() => handleOpenSidebar('outflow')}
-            activeAction={showInflow ? 'inflow' : showOutflow ? 'outflow' : null}
-          />
-
-          <CashbookAssistant
-            currentCashbookId={cashbookId}
-            visible={isCashbookHome && !isAddingMode}
-            buttonBottomClass="bottom-24"
-            panelBottomClass="bottom-32"
-          />
+    <div className="cd-page">
+      {/* Header */}
+      <div className="cd-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="cd-logo-text">CashDiary</div>
         </div>
+        {/* Cashbook selector chip */}
+        <select
+          id="cashbook-select"
+          value={cashbookId || ''}
+          onChange={handleCashbookChange}
+          className="cd-select"
+          style={{ width: 'auto', minWidth: 140, maxWidth: 200, fontSize: '0.85rem', padding: '8px 14px' }}
+        >
+          <option value="">Select book…</option>
+          {cashbooks.map((cb) => (
+            <option key={cb.id} value={cb.id}>{cb.name}</option>
+          ))}
+        </select>
       </div>
+
+      <div style={{ padding: '0 16px' }}>
+        {/* Balance */}
+        {!isAddingMode && (
+          <>
+            <div style={{ marginBottom: 16 }}>
+              <BalanceDisplay cashbookId={cashbookId} />
+            </div>
+
+            {/* Recent Transactions */}
+            {cashbookId && isCashbookHome && (
+              <div className="cd-card" style={{ marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div>
+                    <div className="cd-section-title">Recent Transactions</div>
+                    <div className="cd-section-subtitle">Latest 5 entries</div>
+                  </div>
+                  <button
+                    onClick={() => navigate(`/cashbook/${cashbookId}/history`)}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      color: 'var(--cd-primary)', fontWeight: 600, fontSize: '0.82rem',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    View all →
+                  </button>
+                </div>
+
+                <div className="cd-divider" style={{ marginBottom: 12 }} />
+
+                {recentLoading ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="cd-skeleton" style={{ height: 52, borderRadius: 12 }} />
+                    ))}
+                  </div>
+                ) : recentTransactions.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--cd-text-muted)', fontSize: '0.88rem' }}>
+                    No transactions yet. Add your first entry!
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {recentTransactions.map((t) => {
+                      const decoded = decodeDescription(t.description || '');
+                      const isInflow = t.type === 'inflow';
+                      const bal = Number(t.runningBalance || 0);
+                      return (
+                        <div key={t.id} className="cd-row">
+                          {/* Icon */}
+                          <div className="cd-row-icon" style={{
+                            background: isInflow ? 'var(--cd-success-bg)' : 'var(--cd-danger-bg)',
+                          }}>
+                            <span style={{ fontSize: '1.1rem', color: isInflow ? 'var(--cd-success)' : 'var(--cd-danger)' }}>
+                              {isInflow ? '↓' : '↑'}
+                            </span>
+                          </div>
+                          {/* Middle */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '0.83rem', fontWeight: 600, color: 'var(--cd-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {decoded.description || (isInflow ? 'Cash In' : 'Cash Out')}
+                            </div>
+                            <div style={{ fontSize: '0.72rem', color: 'var(--cd-text-muted)', marginTop: 2 }}>
+                              {formatDateDisplay(t.date)}
+                              {decoded.category && (
+                                <span style={{
+                                  marginLeft: 6,
+                                  background: 'rgba(108,99,255,0.15)',
+                                  color: 'var(--cd-primary)',
+                                  borderRadius: 999, padding: '1px 7px', fontSize: '0.68rem', fontWeight: 600,
+                                }}>
+                                  {decoded.category}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {/* Amounts */}
+                          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                            <div style={{
+                              fontSize: '0.88rem', fontWeight: 700,
+                              color: isInflow ? 'var(--cd-success)' : 'var(--cd-danger)',
+                            }}>
+                              {isInflow ? '+' : '-'}₹{Number(t.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                            </div>
+                            <div style={{
+                              fontSize: '0.72rem',
+                              color: bal >= 0 ? 'var(--cd-success)' : 'var(--cd-danger)',
+                              opacity: 0.8, marginTop: 2,
+                            }}>
+                              ₹{bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Inline forms */}
+        {showInflow && (
+          <div className="cd-card" style={{ marginBottom: 16 }}>
+            <CashInflow
+              cashbookId={cashbookId}
+              onDone={() => {
+                fetchRecentTransactions();
+                setShowInflow(false);
+                navigate(`/cashbook/${cashbookId}`);
+              }}
+            />
+          </div>
+        )}
+        {showOutflow && (
+          <div className="cd-card" style={{ marginBottom: 16 }}>
+            <CashOutflow
+              cashbookId={cashbookId}
+              onDone={() => {
+                fetchRecentTransactions();
+                setShowOutflow(false);
+                navigate(`/cashbook/${cashbookId}`);
+              }}
+            />
+          </div>
+        )}
+
+        {/* Sub-routes */}
+        <Routes>
+          <Route path="history" element={<div><BackButton /><History cashbookId={cashbookId} /></div>} />
+          <Route path="report" element={<div><BackButton /><ReportGenerator cashbookId={cashbookId} /></div>} />
+          <Route path="" element={<div className="py-2" />} />
+        </Routes>
+
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={handleCloseSidebar}
+          type={sidebarType}
+          cashbookId={cashbookId}
+          onSuccess={handleSidebarSuccess}
+        />
+      </div>
+
+      <BottomNavigation
+        cashbookId={cashbookId}
+        onInflowClick={() => handleOpenSidebar('inflow')}
+        onOutflowClick={() => handleOpenSidebar('outflow')}
+        activeAction={showInflow ? 'inflow' : showOutflow ? 'outflow' : null}
+      />
+
+      <CashbookAssistant
+        currentCashbookId={cashbookId}
+        visible={isCashbookHome && !isAddingMode}
+        buttonBottomClass="bottom-24"
+        panelBottomClass="bottom-32"
+      />
     </div>
   );
 };
 
+/* ─── MainApp ────────────────────────────────────────────────── */
 const MainApp = () => {
   const { user, isGuest, loading } = useAuth();
-  const navigate = useNavigate();
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">Loading...</div>
+      <div style={{
+        minHeight: '100vh',
+        background: 'var(--cd-bg)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            background: 'var(--cd-primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }} className="cd-anim-pulse">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <div style={{ color: 'var(--cd-text-soft)', fontSize: '0.9rem' }}>Loading CashDiary…</div>
+        </div>
       </div>
     );
   }
 
   return (
     <Routes>
-      {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      
-      {/* Guest Route */}
       {isGuest && <Route path="/" element={<GuestView />} />}
-      
-      {/* Protected Routes */}
       {!isGuest && (
         <>
           <Route path="/" element={<HomePage />} />
@@ -448,13 +377,12 @@ const MainApp = () => {
           <Route path="/profile" element={<UserProfile />} />
         </>
       )}
-      
-      {/* Redirect guest users */}
       {isGuest && <Route path="*" element={<GuestView />} />}
     </Routes>
   );
 };
 
+/* ─── HomePage ───────────────────────────────────────────────── */
 const HomePage = () => {
   const navigate = useNavigate();
   const [cashbooks, setCashbooks] = useState([]);
@@ -466,18 +394,13 @@ const HomePage = () => {
   const closeCashbookMenu = () => setOpenCashbookMenuId(null);
   const toggleCashbookMenu = (id) => setOpenCashbookMenuId((prev) => (prev === id ? null : id));
 
-  useEffect(() => {
-    fetchCashbooks();
-  }, []);
+  useEffect(() => { fetchCashbooks(); }, []);
 
   useEffect(() => {
     const onDocClick = (e) => {
       if (!openCashbookMenuId) return;
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        closeCashbookMenu();
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target)) closeCashbookMenu();
     };
-
     document.addEventListener('mousedown', onDocClick);
     return () => document.removeEventListener('mousedown', onDocClick);
   }, [openCashbookMenuId]);
@@ -486,60 +409,37 @@ const HomePage = () => {
     try {
       const data = await cashbookAPI.getAll();
       setCashbooks(data);
-    } catch (error) {
-      console.error('Error fetching cashbooks:', error);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error('Error fetching cashbooks:', error); }
+    finally { setLoading(false); }
   };
 
-  const handleCashbookClick = (id) => {
-    navigate(`/cashbook/${id}`);
-  };
+  const handleCashbookClick = (id) => navigate(`/cashbook/${id}`);
 
   const handleEditCashbookName = async (cashbook) => {
     const nextName = window.prompt('Edit cashbook name:', cashbook?.name || '');
     if (nextName == null) return closeCashbookMenu();
-
     const trimmedName = String(nextName).trim();
-    if (!trimmedName) {
-      alert('Cashbook name cannot be empty');
-      return;
-    }
+    if (!trimmedName) { alert('Cashbook name cannot be empty'); return; }
     if (trimmedName === (cashbook?.name || '')) return closeCashbookMenu();
-
     try {
       await cashbookAPI.update(cashbook.id, { name: trimmedName });
       await fetchCashbooks();
-      alert('Cashbook name updated successfully');
     } catch (error) {
-      console.error('Error updating cashbook name:', error);
       alert(error.response?.data?.error || 'Failed to update cashbook name');
-    } finally {
-      closeCashbookMenu();
-    }
+    } finally { closeCashbookMenu(); }
   };
 
   const handleEditCashbookDescription = async (cashbook) => {
-    const nextDescription = window.prompt(
-      'Edit cashbook description (leave blank for none):',
-      cashbook?.description || ''
-    );
+    const nextDescription = window.prompt('Edit cashbook description:', cashbook?.description || '');
     if (nextDescription == null) return closeCashbookMenu();
-
     const trimmedDescription = String(nextDescription).trim();
     if (trimmedDescription === (cashbook?.description || '')) return closeCashbookMenu();
-
     try {
       await cashbookAPI.update(cashbook.id, { description: trimmedDescription });
       await fetchCashbooks();
-      alert('Cashbook description updated successfully');
     } catch (error) {
-      console.error('Error updating cashbook description:', error);
-      alert(error.response?.data?.error || 'Failed to update cashbook description');
-    } finally {
-      closeCashbookMenu();
-    }
+      alert(error.response?.data?.error || 'Failed to update description');
+    } finally { closeCashbookMenu(); }
   };
 
   const handleDeleteCashbook = async (cashbook) => {
@@ -548,280 +448,261 @@ const HomePage = () => {
     try {
       await cashbookAPI.delete(cashbook.id);
       await fetchCashbooks();
-      alert('Cashbook deleted successfully');
     } catch (error) {
-      console.error('Error deleting cashbook:', error);
       alert(error.response?.data?.error || 'Failed to delete cashbook');
-    } finally {
-      closeCashbookMenu();
-    }
+    } finally { closeCashbookMenu(); }
   };
 
+  const COLORS = [
+    { from: '#6C63FF', to: '#A78BFA' },
+    { from: '#00C896', to: '#00A87A' },
+    { from: '#FF5C5C', to: '#E04040' },
+    { from: '#FFB84D', to: '#F97316' },
+    { from: '#60A5FA', to: '#3B82F6' },
+    { from: '#A78BFA', to: '#7C3AED' },
+  ];
+
   return (
-    <div 
-      className="cb-home-shell min-h-screen bg-gray-100 pb-28 sm:pb-20 overflow-x-hidden"
-      style={{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1920&q=80)',
-      }}
-    >
-      <div className="bg-black bg-opacity-60 min-h-screen">
-        <div className="max-w-6xl mx-auto px-2 sm:px-6 py-6 sm:py-10 relative">
-          {/* ambient glow */}
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -top-20 -left-20 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-blue-500 opacity-20 blur-3xl cb-anim-float" />
-            <div className="absolute top-32 -right-24 w-72 h-72 sm:w-[28rem] sm:h-[28rem] rounded-full bg-indigo-500 opacity-20 blur-3xl cb-anim-float-slow" />
+    <div className="cd-page">
+      {/* Header */}
+      <div className="cd-header">
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="cd-logo-text">CashDiary</div>
           </div>
-
-          <div className="mb-5 sm:mb-8 relative cb-anim-fade-in-up">
-            <div className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-2xl shadow-2xl backdrop-blur p-4 sm:p-7 cb-anim-shimmer">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="min-w-0">
-                  <h1 className="text-3xl sm:text-5xl font-extrabold text-white drop-shadow">
-                    CashDiary
-                  </h1>
-                  <p className="text-white text-opacity-90 mt-2 sm:mt-3 text-sm sm:text-base">
-                    Pick a cashbook to open, or create a new one.
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                  <div className="w-full sm:w-auto text-center px-3 sm:px-4 py-2 rounded-xl bg-white bg-opacity-10 border border-white border-opacity-20 text-white text-xs sm:text-sm">
-                    <span className="font-semibold">{cashbooks.length}</span> cashbook{cashbooks.length === 1 ? '' : 's'}
-                  </div>
-                  <button
-                    onClick={() => setIsCreateOpen(true)}
-                    className="w-full sm:w-auto justify-center px-3 sm:px-4 py-2.5 rounded-xl text-white text-xs sm:text-sm font-semibold shadow-xl border border-white border-opacity-20 backdrop-blur bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    aria-label="Create new cashbook"
-                    title="New Cashbook"
-                  >
-                    <span className="inline-flex items-center justify-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      New Cashbook
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
+          <div style={{ fontSize: '0.72rem', color: 'var(--cd-text-muted)', marginTop: 1 }}>
+            {cashbooks.length} cashbook{cashbooks.length !== 1 ? 's' : ''}
           </div>
-
-          {loading ? (
-            <div className="mt-5 sm:mt-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur"
-                  >
-                    <div className="h-4 w-2/3 bg-white bg-opacity-20 rounded mb-4" />
-                    <div className="h-3 w-full bg-white bg-opacity-10 rounded mb-2" />
-                    <div className="h-3 w-5/6 bg-white bg-opacity-10 rounded" />
-                    <div className="mt-6 flex items-center justify-between">
-                      <div className="h-3 w-1/2 bg-white bg-opacity-10 rounded" />
-                      <div className="h-3 w-12 bg-white bg-opacity-10 rounded" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : cashbooks.length === 0 ? (
-            <div className="mt-5 sm:mt-8">
-              <div className="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-2xl shadow-2xl backdrop-blur p-8 sm:p-10 text-center">
-                <div className="text-3xl sm:text-4xl mb-3 font-bold text-white">CB</div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-white drop-shadow mb-2">No cashbooks yet</h2>
-                <p className="text-white text-opacity-90">Tap <span className="font-semibold">New Cashbook</span> to create your first cashbook.</p>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-              {cashbooks.map((cashbook) => {
-                const createdLabel = cashbook.created_at
-                  ? new Date(cashbook.created_at).toLocaleDateString()
-                  : '';
-                const initial = (cashbook.name || 'C').slice(0, 1).toUpperCase();
-
-                return (
-                  <div
-                    key={cashbook.id}
-                    onClick={() => handleCashbookClick(cashbook.id)}
-                    className="group cursor-pointer cb-anim-fade-in-up"
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') handleCashbookClick(cashbook.id);
-                    }}
-                  >
-                    <div className="relative bg-white bg-opacity-95 rounded-2xl shadow-xl border border-white border-opacity-40 overflow-visible transform transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-2xl">
-                      {/* premium ring */}
-                      <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-black ring-opacity-5" />
-
-                      {/* top accent */}
-                      <div className="h-1 bg-gradient-to-r from-blue-600 to-indigo-600" />
-
-                      {/* hover shine */}
-                      <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <div className="absolute -inset-y-8 -left-1/2 w-1/2 rotate-12 bg-gradient-to-r from-transparent via-white/35 to-transparent cb-anim-shimmer" />
-                      </div>
-
-                      <div className="p-4 sm:p-6 relative">
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                          <div className="absolute -top-16 -right-16 w-52 h-52 rounded-full bg-blue-500 opacity-10 blur-2xl" />
-                          <div className="absolute -bottom-20 -left-20 w-52 h-52 rounded-full bg-indigo-500 opacity-10 blur-2xl" />
-                        </div>
-                        <div className="flex items-start gap-4">
-                          <div className="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-extrabold shadow-sm border border-blue-200">
-                            {initial}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-lg sm:text-xl font-extrabold text-gray-900 truncate">
-                              {cashbook.name}
-                            </h3>
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                              {cashbook.description || 'No description'}
-                            </p>
-                          </div>
-
-                          {/* Per-cashbook menu */}
-                          <div
-                            ref={openCashbookMenuId === cashbook.id ? menuRef : null}
-                            className="relative z-50 shrink-0"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <button
-                              type="button"
-                              aria-label="Cashbook options"
-                              title="Options"
-                              className="w-9 h-9 rounded-lg bg-white bg-opacity-90 border border-gray-200 shadow-sm hover:bg-opacity-100 flex items-center justify-center text-gray-700"
-                              onClick={() => toggleCashbookMenu(cashbook.id)}
-                            >
-                              <span className="text-xl leading-none">⋮</span>
-                            </button>
-
-                            {openCashbookMenuId === cashbook.id && (
-                              <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white border border-gray-200 shadow-lg overflow-hidden z-50">
-                                <button
-                                  type="button"
-                                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                                  onClick={() => handleEditCashbookName(cashbook)}
-                                >
-                                  Edit cashbook name
-                                </button>
-                                <button
-                                  type="button"
-                                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                                  onClick={() => handleEditCashbookDescription(cashbook)}
-                                >
-                                  Edit description
-                                </button>
-                                <button
-                                  type="button"
-                                  className="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50"
-                                  onClick={() => handleDeleteCashbook(cashbook)}
-                                >
-                                  Delete cashbook
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="mt-5 flex items-center justify-between gap-3">
-                          <div className="text-xs sm:text-sm text-gray-500 truncate">
-                            {createdLabel ? `Created: ${createdLabel}` : ' '}
-                          </div>
-                          <div className="text-blue-700 font-semibold text-sm transform transition-transform duration-200 group-hover:translate-x-0.5">
-                            Open <span className="inline-block transform transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Floating + Add Cashbook (above bottom nav) */}
-          <button
-            onClick={() => setIsCreateOpen(true)}
-            className="group fixed right-3 sm:right-4 bottom-28 sm:bottom-24 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-2xl flex items-center justify-center z-50 ring-4 ring-blue-200 ring-opacity-30"
-            aria-label="Add new cashbook"
-            title="New Cashbook"
-          >
-            <span className="pointer-events-none absolute right-full mr-3 px-3 py-1 rounded-lg text-xs font-semibold bg-black bg-opacity-70 text-white opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity whitespace-nowrap">
-              New Cashbook
-            </span>
-            <span className="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20 animate-ping" />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-7 h-7"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
-
-          {/* Create Cashbook Modal */}
-          {isCreateOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="absolute inset-0 bg-black bg-opacity-60" onClick={() => setIsCreateOpen(false)} />
-              <div className="relative z-10 w-full max-w-lg">
-                <div className="flex justify-end mb-2">
-                  <button
-                    onClick={() => setIsCreateOpen(false)}
-                    className="text-white text-3xl leading-none"
-                    aria-label="Close"
-                    title="Close"
-                  >
-                    ×
-                  </button>
-                </div>
-                <CreateCashbook
-                  onSuccess={() => {
-                    fetchCashbooks();
-                    setIsCreateOpen(false);
-                  }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Bottom Navigation */}
-          <BottomNavigation
-            cashbookId={null}
-            onInflowClick={() => alert('Please select a cashbook first')}
-            onOutflowClick={() => alert('Please select a cashbook first')}
-            activeAction={null}
-          />
-
-          <CashbookAssistant
-            currentCashbookId={null}
-            visible={true}
-            side="right"
-            buttonBottomClass="bottom-40"
-            panelBottomClass="bottom-48"
-          />
         </div>
+        <button
+          onClick={() => setIsCreateOpen(true)}
+          className="cd-btn cd-btn-primary cd-btn-sm"
+          aria-label="Create new cashbook"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M12 4v16m8-8H4"/>
+          </svg>
+          New
+        </button>
       </div>
+
+      <div style={{ padding: '8px 16px', paddingBottom: 20 }}>
+        {loading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="cd-skeleton" style={{ height: 120, borderRadius: 16 }} />
+            ))}
+          </div>
+        ) : cashbooks.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }} className="cd-anim-fade-up">
+            <div style={{ fontSize: '3rem', marginBottom: 12 }}>📒</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--cd-text)', marginBottom: 6 }}>No cashbooks yet</div>
+            <div style={{ fontSize: '0.88rem', color: 'var(--cd-text-soft)', marginBottom: 24, lineHeight: 1.5 }}>
+              Create your first cashbook to start tracking income & expenses
+            </div>
+            <button onClick={() => setIsCreateOpen(true)} className="cd-btn cd-btn-primary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M12 4v16m8-8H4"/>
+              </svg>
+              Create Cashbook
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+            {cashbooks.map((cashbook, idx) => {
+              const color = COLORS[idx % COLORS.length];
+              const initial = (cashbook.name || 'C').slice(0, 1).toUpperCase();
+              const createdLabel = cashbook.created_at
+                ? new Date(cashbook.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+                : '';
+              return (
+                <div
+                  key={cashbook.id}
+                  onClick={() => handleCashbookClick(cashbook.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleCashbookClick(cashbook.id); }}
+                  className="cd-card-elevated cd-anim-fade-up"
+                  style={{ cursor: 'pointer', transition: 'transform 180ms ease, box-shadow 180ms ease', overflow: 'hidden' }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  {/* Top gradient strip */}
+                  <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+                    background: `linear-gradient(90deg, ${color.from}, ${color.to})`,
+                  }} />
+                  <div style={{ paddingTop: 4, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    {/* Avatar */}
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 14, flexShrink: 0,
+                      background: `linear-gradient(135deg, ${color.from}, ${color.to})`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#fff', fontWeight: 800, fontSize: '1.1rem',
+                      boxShadow: `0 6px 16px ${color.from}55`,
+                    }}>
+                      {initial}
+                    </div>
+                    {/* Info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--cd-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {cashbook.name}
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--cd-text-muted)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {cashbook.description || 'No description'}
+                      </div>
+                    </div>
+                    {/* Menu button */}
+                    <div
+                      ref={openCashbookMenuId === cashbook.id ? menuRef : null}
+                      style={{ position: 'relative', zIndex: 50, flexShrink: 0 }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        aria-label="Options"
+                        onClick={() => toggleCashbookMenu(cashbook.id)}
+                        style={{
+                          width: 32, height: 32, borderRadius: 8, cursor: 'pointer',
+                          background: 'rgba(255,255,255,0.06)',
+                          border: '1px solid var(--cd-border)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: 'var(--cd-text-soft)', fontSize: '1.2rem', fontFamily: 'inherit',
+                        }}
+                      >
+                        ⋮
+                      </button>
+                      {openCashbookMenuId === cashbook.id && (
+                        <div style={{
+                          position: 'absolute', right: 0, marginTop: 4,
+                          width: 180, borderRadius: 12,
+                          background: 'var(--cd-surface-2)',
+                          border: '1px solid var(--cd-border)',
+                          boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+                          overflow: 'hidden', zIndex: 60,
+                        }}>
+                          {[
+                            { label: 'Edit name', fn: () => handleEditCashbookName(cashbook) },
+                            { label: 'Edit description', fn: () => handleEditCashbookDescription(cashbook) },
+                          ].map((item) => (
+                            <button
+                              key={item.label}
+                              type="button"
+                              onClick={item.fn}
+                              style={{
+                                width: '100%', textAlign: 'left', padding: '10px 14px',
+                                fontSize: '0.85rem', color: 'var(--cd-text)', background: 'none',
+                                border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                                borderBottom: '1px solid var(--cd-border)',
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                              onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                            >
+                              {item.label}
+                            </button>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteCashbook(cashbook)}
+                            style={{
+                              width: '100%', textAlign: 'left', padding: '10px 14px',
+                              fontSize: '0.85rem', color: 'var(--cd-danger)', background: 'none',
+                              border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,92,92,0.08)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                          >
+                            Delete cashbook
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--cd-text-muted)' }}>{createdLabel ? `Created ${createdLabel}` : ''}</div>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 600, color: color.from }}>Open →</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* FAB */}
+      <button
+        onClick={() => setIsCreateOpen(true)}
+        aria-label="New cashbook"
+        style={{
+          position: 'fixed', right: 20, bottom: 'calc(var(--cd-nav-h) + 20px)', zIndex: 40,
+          width: 52, height: 52, borderRadius: 999, border: 'none', cursor: 'pointer',
+          background: 'var(--cd-primary)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 10px 28px rgba(108,99,255,0.5)',
+          transition: 'transform 150ms ease',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.08)'}
+        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+          <path d="M12 4v16m8-8H4"/>
+        </svg>
+      </button>
+
+      {/* Create Modal */}
+      {isCreateOpen && (
+        <div className="cd-overlay" onClick={() => setIsCreateOpen(false)}>
+          <div className="cd-modal" onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--cd-text)' }}>New Cashbook</div>
+              <button
+                onClick={() => setIsCreateOpen(false)}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: 'var(--cd-text-muted)', fontSize: '1.4rem', lineHeight: 1,
+                }}
+              >×</button>
+            </div>
+            <CreateCashbook
+              onSuccess={() => {
+                fetchCashbooks();
+                setIsCreateOpen(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      <BottomNavigation
+        cashbookId={null}
+        onInflowClick={() => alert('Please select a cashbook first')}
+        onOutflowClick={() => alert('Please select a cashbook first')}
+        activeAction={null}
+      />
+
+      <CashbookAssistant
+        currentCashbookId={null}
+        visible={true}
+        side="right"
+        buttonBottomClass="bottom-40"
+        panelBottomClass="bottom-48"
+      />
     </div>
   );
 };
 
+/* ─── Theme Initializer ─────────────────────────────────────── */
 const ThemeInitializer = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const root = document.documentElement;
     const stored = localStorage.getItem('theme');
     const theme = stored === 'dark' || stored === 'light' ? stored : 'light';
-    root.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
   }, []);
-
   return null;
 };
 
+/* ─── Root ──────────────────────────────────────────────────── */
 function App() {
   return (
     <AuthProvider>
