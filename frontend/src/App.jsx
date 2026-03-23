@@ -523,13 +523,14 @@ const HomePage = () => {
                   tabIndex={0}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleCashbookClick(cashbook.id); }}
                   className="cd-card-elevated cd-anim-fade-up"
-                  style={{ cursor: 'pointer', transition: 'transform 180ms ease, box-shadow 180ms ease', overflow: 'hidden' }}
+                  style={{ cursor: 'pointer', transition: 'transform 180ms ease, box-shadow 180ms ease' }}
                   onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
                   {/* Top gradient strip */}
                   <div style={{
                     position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+                    borderTopLeftRadius: 'var(--cd-radius)', borderTopRightRadius: 'var(--cd-radius)',
                     background: `linear-gradient(90deg, ${color.from}, ${color.to})`,
                   }} />
                   <div style={{ paddingTop: 4, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
